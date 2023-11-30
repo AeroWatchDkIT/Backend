@@ -8,6 +8,7 @@ namespace PalletSyncApi.Context
     {
         public DbSet<Shelf> Shelves { get; set; }
         public DbSet<Pallet> Pallets { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -39,6 +40,15 @@ namespace PalletSyncApi.Context
                new Shelf { Id = "S-0004", Location = "Warehouse A", PalletId = null },
                new Shelf { Id = "S-0005", Location = "Warehouse A", PalletId = null }
            );
+
+            modelBuilder.Entity<User>().HasData(
+                new User { Id = "U-0001", UserType = UserType.Admin, FirstName = "Kacper", LastName = "Wroblewski", Passcode = "245tbgt", ForkliftCertified = true, IncorrectPalletPlacements = 0 },
+                new User { Id = "U-0002", UserType = UserType.Regular, FirstName = "Nikita", LastName = "Fedans", Passcode = "245tbgt", ForkliftCertified = true, IncorrectPalletPlacements = 13 },
+                new User { Id = "U-0003", UserType = UserType.Regular, FirstName = "Teodor", LastName = "Donchev", Passcode = "245tbgt", ForkliftCertified = true, IncorrectPalletPlacements = 3 },
+                new User { Id = "U-0004", UserType = UserType.Regular, FirstName = "Vincent", LastName = "Arellano", Passcode = "245tbgt", ForkliftCertified = false, IncorrectPalletPlacements = 0 },
+                new User { Id = "U-0005", UserType = UserType.Regular, FirstName = "Kyle", LastName = "McQuillan", Passcode = "245tbgt", ForkliftCertified = false, IncorrectPalletPlacements = 0 },
+                new User { Id = "U-0006", UserType = UserType.Admin, FirstName = "Siya", LastName = "Salekar", Passcode = "245tbgt", ForkliftCertified = false, IncorrectPalletPlacements = 0 }
+                );
         }
     }
 }

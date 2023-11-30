@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PalletSyncApi.Context;
 
@@ -10,9 +11,11 @@ using PalletSyncApi.Context;
 namespace PalletSyncApi.Migrations
 {
     [DbContext(typeof(PalletSyncDbContext))]
-    partial class PalletSyncDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231130123101_Created_User_Class")]
+    partial class Created_User_Class
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

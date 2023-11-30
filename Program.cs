@@ -10,6 +10,24 @@ using (PalletSyncDbContext context = new PalletSyncDbContext())
     context.Database.EnsureCreated();
 }
 
+void PrintAllUsers() { 
+    using var context = new PalletSyncDbContext();
+    var users = context.Users.ToList();
+
+    Console.WriteLine("USERS");
+    foreach (var user in users)
+    {
+        Console.WriteLine("-----------------------");
+        Console.WriteLine("Id: " + user.Id);
+        Console.WriteLine("UserType: " + user.UserType.ToString());
+        Console.WriteLine("FistName: " + user.FirstName);
+        Console.WriteLine("LastName: " + user.LastName);
+        Console.WriteLine("ForkliftCertified: " + user.ForkliftCertified);
+        Console.WriteLine("IncorrectPalletPlacements: " + user.IncorrectPalletPlacements);
+        Console.WriteLine("-----------------------");
+    }
+}
+
 void AddShelf()
 {
     var shelf = new Shelf { Id = "S-1234", Location = "Room A3" };
@@ -51,7 +69,7 @@ void GetAllShelvesAndPallets()
 
 AddShelf();
 GetAllShelvesAndPallets();
-
+PrintAllUsers();
 
 //****API SETUP****
 
