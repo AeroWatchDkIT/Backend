@@ -28,6 +28,19 @@ void PrintAllUsers() {
     }
 }
 
+IEnumerable<Shelf> GetAllShelves()
+{
+    using var context = new PalletSyncDbContext();
+    return context.Shelves.ToList();
+}
+
+IEnumerable<Pallet> GetAllPallets()
+{
+    using var context = new PalletSyncDbContext();
+    return context.Pallets.ToList();
+}
+
+
 void AddShelf()
 {
     var shelf = new Shelf { Id = "S-1234", Location = "Room A3" };
@@ -42,34 +55,11 @@ void AddShelf()
     }
 }
 
-void GetAllShelvesAndPallets()
-{
-    using var context = new PalletSyncDbContext();
-    var shelves = context.Shelves.Include(a => a.Pallet).ToList();
-
-    foreach (var shelf in shelves)
-    {
-        Console.WriteLine(shelf.Id);
-        Console.WriteLine(shelf.Location);
-
-        Console.WriteLine("\nPALLETE");
-        if (shelf.Pallet != null) {
-            Console.WriteLine(shelf.Pallet.Id);
-            Console.WriteLine(shelf.Pallet.State.ToString());
-            Console.WriteLine(shelf.Pallet.Location);
-        }
-        else
-        {
-            Console.WriteLine("None");
-        }
-
-        Console.WriteLine();
-    }
-}
-
 AddShelf();
-GetAllShelvesAndPallets();
 PrintAllUsers();
+
+
+
 
 //****API SETUP****
 
