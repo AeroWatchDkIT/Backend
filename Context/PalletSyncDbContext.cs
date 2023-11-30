@@ -11,6 +11,14 @@ namespace PalletSyncApi.Context
         public DbSet<User> Users { get; set; }
         public DbSet<Forklift> Forklifts { get; set; }
 
+        public PalletSyncDbContext()
+        {
+        }
+
+        public PalletSyncDbContext(DbContextOptions<PalletSyncDbContext> options) : base(options)
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(
