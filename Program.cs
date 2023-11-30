@@ -28,6 +28,24 @@ void PrintAllUsers() {
     }
 }
 
+void PrintAllForklifts()
+{
+    using var context = new PalletSyncDbContext();
+    var forklifts = context.Forklifts.Include(f => f.LastUser).Include(f => f.LastPallet).ToList();
+
+    Console.WriteLine("FORKLIFTS");
+    foreach(var forklift in forklifts)
+    {
+        Console.WriteLine("-----------------------");
+        Console.WriteLine("Id: " + forklift.Id);
+        Console.WriteLine("LastUserId: " + forklift.LastUserId);
+        Console.WriteLine("UserFirstName: " + forklift.LastUser.FirstName);
+        Console.WriteLine("LastPalletId: " + forklift.LastPalletId);
+        Console.WriteLine("LastPalletState: " + forklift.LastPallet.State.ToString());
+        Console.WriteLine("-----------------------");
+    }
+}
+
 IEnumerable<Shelf> GetAllShelves()
 {
     using var context = new PalletSyncDbContext();
@@ -57,6 +75,8 @@ void AddShelf()
 
 AddShelf();
 PrintAllUsers();
+Console.WriteLine();
+PrintAllForklifts();
 
 
 

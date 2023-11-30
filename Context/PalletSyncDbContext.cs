@@ -9,6 +9,7 @@ namespace PalletSyncApi.Context
         public DbSet<Shelf> Shelves { get; set; }
         public DbSet<Pallet> Pallets { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Forklift> Forklifts { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -48,6 +49,25 @@ namespace PalletSyncApi.Context
                 new User { Id = "U-0004", UserType = UserType.Regular, FirstName = "Vincent", LastName = "Arellano", Passcode = "245tbgt", ForkliftCertified = false, IncorrectPalletPlacements = 0 },
                 new User { Id = "U-0005", UserType = UserType.Regular, FirstName = "Kyle", LastName = "McQuillan", Passcode = "245tbgt", ForkliftCertified = false, IncorrectPalletPlacements = 0 },
                 new User { Id = "U-0006", UserType = UserType.Admin, FirstName = "Siya", LastName = "Salekar", Passcode = "245tbgt", ForkliftCertified = false, IncorrectPalletPlacements = 0 }
+                );
+
+            modelBuilder.Entity<Forklift>()
+                .HasOne(f => f.LastUser)
+                .WithMany()
+                .HasForeignKey(f => f.LastUserId)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Forklift>()
+                .HasOne(f => f.LastPallet)
+                .WithMany()
+                .HasForeignKey(f => f.LastPalletId)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Forklift>().HasData(
+                new Forklift { Id = "F-0012", LastUserId = "U-0001", LastPalletId = "P-0003" },
+                new Forklift { Id = "F-0007", LastUserId = "U-0002", LastPalletId = "P-0003" },
+                new Forklift { Id = "F-0205", LastUserId = "U-0003", LastPalletId = "P-0001" },
+                new Forklift { Id = "F-0016", LastUserId = "U-0003", LastPalletId = "P-0005" }
                 );
         }
     }
