@@ -12,20 +12,24 @@ using (PalletSyncDbContext context = new PalletSyncDbContext())
 
 void PrintAllUsers() { 
     using var context = new PalletSyncDbContext();
-    var users = context.Users.ToList();
-
-    Console.WriteLine("USERS");
-    foreach (var user in users)
+    try
     {
-        Console.WriteLine("-----------------------");
-        Console.WriteLine("Id: " + user.Id);
-        Console.WriteLine("UserType: " + user.UserType.ToString());
-        Console.WriteLine("FistName: " + user.FirstName);
-        Console.WriteLine("LastName: " + user.LastName);
-        Console.WriteLine("ForkliftCertified: " + user.ForkliftCertified);
-        Console.WriteLine("IncorrectPalletPlacements: " + user.IncorrectPalletPlacements);
-        Console.WriteLine("-----------------------");
+        var users = context.Users.ToList();
+
+        Console.WriteLine("USERS");
+        foreach (var user in users)
+        {
+            Console.WriteLine("-----------------------");
+            Console.WriteLine("Id: " + user.Id);
+            Console.WriteLine("UserType: " + user.UserType.ToString());
+            Console.WriteLine("FistName: " + user.FirstName);
+            Console.WriteLine("LastName: " + user.LastName);
+            Console.WriteLine("ForkliftCertified: " + user.ForkliftCertified);
+            Console.WriteLine("IncorrectPalletPlacements: " + user.IncorrectPalletPlacements);
+            Console.WriteLine("-----------------------");
+        }
     }
+    catch (Exception ex) { Console.WriteLine(ex); }
 }
 
 void PrintAllForklifts()
