@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PalletSyncApi.Services;
 using System.Text.Json;
+using PalletSyncApi.Classes;
 
 namespace PalletSyncApi.Controllers
 {
@@ -18,13 +19,11 @@ namespace PalletSyncApi.Controllers
 
 
         [HttpGet(Name = "Forklifts")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetForklifts()
         {
             try
-            {
-                var result = _forkliftService.GetAllForklifts();
-                var jsonResult = JsonSerializer.Serialize(result);
-                return Ok(jsonResult);
+            { 
+                return Ok(JsonSerializer.Serialize(await _forkliftService.GetAllForkliftsAsync()));
             }
             catch (Exception ex)
             {
@@ -33,9 +32,25 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpPost(Name = "Forklifts")]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> AddForklift([FromBody] Forklift forklift)
         {
-            return NotFound();
+            if (!ModelState.IsValid || string.IsNullOrEmpty(forklift.Id))
+            {
+                return BadRequest("Invalid object!");
+            }
+
+            forklift = sanitiseForkliftInput(forklift);
+
+            try {
+                await _forkliftService.AddForkliftAsync(forklift);
+                return StatusCode(201);
+            } 
+            catch(InvalidOperationException) {
+                return BadRequest($"Forklift with Id {forklift.Id} already exists!");
+            }
+            catch (Exception ex){
+                return BadRequest(ex);
+            }
         }
 
         [HttpPut(Name = "Forklifts")]
@@ -48,6 +63,15 @@ namespace PalletSyncApi.Controllers
         public async Task<IActionResult> Delete()
         {
             return Ok();
+        }
+
+        private Forklift sanitiseForkliftInput(Forklift forklift)
+        {
+            forklift.LastPallet = null;
+            forklift.LastPalletId = null;
+            forklift.LastUser = null;
+            forklift.LastUserId = null;
+            return forklift;
         }
 
     }

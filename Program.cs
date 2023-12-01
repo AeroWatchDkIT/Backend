@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
 using PalletSyncApi.Enums;
+using PalletSyncApi.Services;
 
 //****DATABASE SETUP****
 
@@ -42,10 +44,10 @@ void PrintAllForklifts()
     {
         Console.WriteLine("-----------------------");
         Console.WriteLine("Id: " + forklift.Id);
-        Console.WriteLine("LastUserId: " + forklift.LastUserId);
-        Console.WriteLine("UserFirstName: " + forklift.LastUser.FirstName);
-        Console.WriteLine("LastPalletId: " + forklift.LastPalletId);
-        Console.WriteLine("LastPalletState: " + forklift.LastPallet.State.ToString());
+        Console.WriteLine("LastUserId: " + (string.IsNullOrEmpty(forklift.LastUserId) ? "Null" : forklift.LastUserId));
+        Console.WriteLine("UserFirstName: " + (forklift?.LastUser?.FirstName ?? "Null"));
+        Console.WriteLine("LastPalletId: " + (string.IsNullOrEmpty(forklift.LastPalletId) ? "Null" : forklift.LastPalletId));
+        Console.WriteLine("LastPalletState: " + (forklift?.LastPallet?.State.ToString() ?? "Null"));
         Console.WriteLine("-----------------------");
     }
 }
@@ -91,7 +93,7 @@ PrintAllForklifts();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddSingleton<IForkliftService, ForkliftService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

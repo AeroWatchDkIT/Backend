@@ -4,6 +4,7 @@ namespace PalletSyncApi.Services
 {
     public interface IForkliftService
     {
-        public List<Forklift> GetAllForklifts();
+        public Task<List<Forklift>> GetAllForkliftsAsync();
+        public Task AddForkliftAsync(Forklift forklift);
     }
 }
