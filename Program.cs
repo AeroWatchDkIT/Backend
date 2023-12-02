@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
 using PalletSyncApi.Enums;
+using PalletSyncApi.Services;
 
 //****DATABASE SETUP****
 
@@ -12,20 +14,24 @@ using (PalletSyncDbContext context = new PalletSyncDbContext())
 
 void PrintAllUsers() { 
     using var context = new PalletSyncDbContext();
-    var users = context.Users.ToList();
-
-    Console.WriteLine("USERS");
-    foreach (var user in users)
+    try
     {
-        Console.WriteLine("-----------------------");
-        Console.WriteLine("Id: " + user.Id);
-        Console.WriteLine("UserType: " + user.UserType.ToString());
-        Console.WriteLine("FistName: " + user.FirstName);
-        Console.WriteLine("LastName: " + user.LastName);
-        Console.WriteLine("ForkliftCertified: " + user.ForkliftCertified);
-        Console.WriteLine("IncorrectPalletPlacements: " + user.IncorrectPalletPlacements);
-        Console.WriteLine("-----------------------");
+        var users = context.Users.ToList();
+
+        Console.WriteLine("USERS");
+        foreach (var user in users)
+        {
+            Console.WriteLine("-----------------------");
+            Console.WriteLine("Id: " + user.Id);
+            Console.WriteLine("UserType: " + user.UserType.ToString());
+            Console.WriteLine("FistName: " + user.FirstName);
+            Console.WriteLine("LastName: " + user.LastName);
+            Console.WriteLine("ForkliftCertified: " + user.ForkliftCertified);
+            Console.WriteLine("IncorrectPalletPlacements: " + user.IncorrectPalletPlacements);
+            Console.WriteLine("-----------------------");
+        }
     }
+    catch (Exception ex) { Console.WriteLine(ex); }
 }
 
 void PrintAllForklifts()
@@ -38,10 +44,10 @@ void PrintAllForklifts()
     {
         Console.WriteLine("-----------------------");
         Console.WriteLine("Id: " + forklift.Id);
-        Console.WriteLine("LastUserId: " + forklift.LastUserId);
-        Console.WriteLine("UserFirstName: " + forklift.LastUser.FirstName);
-        Console.WriteLine("LastPalletId: " + forklift.LastPalletId);
-        Console.WriteLine("LastPalletState: " + forklift.LastPallet.State.ToString());
+        Console.WriteLine("LastUserId: " + (string.IsNullOrEmpty(forklift.LastUserId) ? "Null" : forklift.LastUserId));
+        Console.WriteLine("UserFirstName: " + (forklift?.LastUser?.FirstName ?? "Null"));
+        Console.WriteLine("LastPalletId: " + (string.IsNullOrEmpty(forklift.LastPalletId) ? "Null" : forklift.LastPalletId));
+        Console.WriteLine("LastPalletState: " + (forklift?.LastPallet?.State.ToString() ?? "Null"));
         Console.WriteLine("-----------------------");
     }
 }
@@ -87,7 +93,7 @@ PrintAllForklifts();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddSingleton<IForkliftService, ForkliftService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
