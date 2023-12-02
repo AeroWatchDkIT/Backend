@@ -23,7 +23,7 @@ namespace PalletSyncApi.Controllers
         {
             try
             { 
-                return Ok(JsonSerializer.Serialize(await _forkliftService.GetAllForkliftsAsync()));
+                return Ok(await _forkliftService.GetAllForkliftsAsync());
             }
             catch (Exception ex)
             {
