@@ -18,12 +18,12 @@ namespace PalletSyncApi.Controllers
         }
 
 
-        [HttpGet(Name = "Forklifts")]
+        [HttpGet]
         public async Task<IActionResult> GetForklifts()
         {
             try
             { 
-                return Ok(JsonSerializer.Serialize(await _forkliftService.GetAllForkliftsAsync()));
+                return Ok(await _forkliftService.GetAllForkliftsAsync());
             }
             catch (Exception ex)
             {
@@ -31,7 +31,7 @@ namespace PalletSyncApi.Controllers
             }
         }
 
-        [HttpPost(Name = "Forklifts")]
+        [HttpPost]
         public async Task<IActionResult> AddForklift([FromBody] Forklift forklift)
         {
             if (!ModelState.IsValid || string.IsNullOrEmpty(forklift.Id))
@@ -52,6 +52,23 @@ namespace PalletSyncApi.Controllers
                 return BadRequest(ex);
             }
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchForklifts([FromQuery] string requestedId)
+        {
+            try
+            {
+                return Ok(await _forkliftService.SearchForkliftsAsync(requestedId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
+
+            // think about validation for this one, is injection possible?
+
+        }
+
 
         [HttpPut(Name = "Forklifts")]
         public async Task<IActionResult> Put()
