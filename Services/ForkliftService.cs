@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
+using System.IO.Pipelines;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
@@ -12,12 +13,19 @@ public class ForkliftService: IForkliftService
     {
         PalletSyncDbContext context = new PalletSyncDbContext();
         
-        public async Task<List<Forklift>> GetAllForkliftsAsync()
+        public async Task<object> GetAllForkliftsAsync()
         {
-            var Forklifts = await context.Forklifts.ToListAsync();
-            return Forklifts;
+            var dbQuery = from forklift in context.Forklifts
+                        join user in context.Users on forklift.LastUserId equals user.Id into ps
+                        from user in ps.DefaultIfEmpty()
+                        select new
+                        {
+                            id = forklift.Id,
+                            lastUser = $"{user.FirstName} {user.LastName}",
+                            lastPallet = forklift.LastPalletId,
+                        };
 
-            // This one will need to be reworked a bit to return the same objects as SearchForkliftsAsync
+            return await dbQuery.ToListAsync();
         }
 
         public async Task AddForkliftAsync(Forklift forklift)
@@ -26,13 +34,13 @@ public class ForkliftService: IForkliftService
             await context.SaveChangesAsync();
         }
 
-        public async Task<List<ForkliftUiResult>> SearchForkliftsAsync(string requestedId)
+        public async Task<object> SearchForkliftsAsync(SearchForklift query)
         {
 
-            var query = from forklift in context.Forklifts
+            var dbQuery = from forklift in context.Forklifts
                          join user in context.Users on forklift.LastUserId equals user.Id into ps
                          from user in ps.DefaultIfEmpty()
-                         where forklift.Id.Contains(requestedId) || user.FirstName.Contains(requestedId) || user.LastName.Contains(requestedId)
+                         where forklift.Id.Contains(query.SearchTerm) || user.FirstName.Contains(query.SearchTerm) || user.LastName.Contains(query.SearchTerm)
                          select new
                          {
                              id = forklift.Id,
@@ -40,21 +48,26 @@ public class ForkliftService: IForkliftService
                              lastPallet = forklift.LastPalletId,
                          };
 
-            var result = await query.ToListAsync();
-
-            List<ForkliftUiResult> readyResult = new List<ForkliftUiResult>();
-
-            foreach(var x in result)
-            {
-                var additionalResult = new ForkliftUiResult(x.id, x.lastUser, x.lastPallet);
-                readyResult.Add(additionalResult);
-            }
-            
-            //look over this one, might be a cleaner way to do it, test it well
-
-            return readyResult;
+            return await dbQuery.ToListAsync();
+            // Hey check it out Kacper, no need for making a list of objects with some new class, this works just fine!
         }
 
+        public async Task<object> GetForkliftById(string id)
+        {
+
+            var dbQuery = from forklift in context.Forklifts
+                          join user in context.Users on forklift.LastUserId equals user.Id into ps
+                          from user in ps.DefaultIfEmpty()
+                          where forklift.Id.Equals(id)
+                          select new
+                          {
+                              id = forklift.Id,
+                              lastUser = $"{user.FirstName} {user.LastName}",
+                              lastPallet = forklift.LastPalletId,
+                          };
+
+            return await dbQuery.FirstOrDefaultAsync();
+        }
 
     }
 }

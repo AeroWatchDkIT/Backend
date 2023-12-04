@@ -27,6 +27,7 @@ namespace PalletSyncApi.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return StatusCode(500);
             }
         }
@@ -54,19 +55,36 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> SearchForklifts([FromQuery] string requestedId)
+        public async Task<IActionResult> SearchForklifts([FromQuery] SearchForklift query)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
             try
             {
-                return Ok(await _forkliftService.SearchForkliftsAsync(requestedId));
+                return Ok(await _forkliftService.SearchForkliftsAsync(query));
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return StatusCode(500);
             }
+        }
 
-            // think about validation for this one, is injection possible?
-
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetForkliftsById(string id)
+        {
+            try
+            {
+                return Ok(await _forkliftService.GetForkliftById(id));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
+            // Come back to this and figure out a decent way to validate the id
         }
 
 
