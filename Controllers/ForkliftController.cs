@@ -2,6 +2,7 @@
 using PalletSyncApi.Services;
 using System.Text.Json;
 using PalletSyncApi.Classes;
+using Microsoft.EntityFrameworkCore;
 
 namespace PalletSyncApi.Controllers
 {
@@ -49,6 +50,10 @@ namespace PalletSyncApi.Controllers
             catch(InvalidOperationException) {
                 return BadRequest($"Forklift with Id {forklift.Id} already exists!");
             }
+            catch (DbUpdateException)
+            {
+                return BadRequest($"Forklift with Id {forklift.Id} already exists!");
+            }
             catch (Exception ex){
                 return BadRequest(ex);
             }
@@ -73,11 +78,16 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetForkliftsById(string id)
+        public async Task<IActionResult> GetForkliftById(string id)
         {
             try
             {
-                return Ok(await _forkliftService.GetForkliftById(id));
+                var result = await _forkliftService.GetForkliftById(id);
+                if(result != null)
+                {
+                    return Ok(result);
+                }
+                return NotFound();
             }
             catch (Exception ex)
             {
@@ -94,10 +104,23 @@ namespace PalletSyncApi.Controllers
             return BadRequest();
         }
 
-        [HttpDelete(Name = "Forklifts")]
-        public async Task<IActionResult> Delete()
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteForkliftById(string id)
         {
-            return Ok();
+            try
+            {
+                bool forkliftDeleted = await _forkliftService.DeleteObjectById(id);
+                if (forkliftDeleted)
+                {
+                    return Ok();
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
         }
 
         private Forklift sanitiseForkliftInput(Forklift forklift)

@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
-using System.IO.Pipelines;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 
@@ -21,17 +19,41 @@ public class ForkliftService: IForkliftService
                         select new
                         {
                             id = forklift.Id,
-                            lastUser = $"{user.FirstName} {user.LastName}",
-                            lastPallet = forklift.LastPalletId,
+                            lastUserId = user.Id,
+                            lastUser = user != null? $"{user.FirstName} {user.LastName}" : null,
+                            lastPallet = forklift.LastPalletId
                         };
 
-            return await dbQuery.ToListAsync();
+            var forklifts = await dbQuery.ToListAsync();
+            return WrapListOfForklifts(forklifts);
+
+            // the reason for wrapping is https://youtu.be/60F8rzP5nQo?si=istwlDOjK0S2XtJO&t=295
         }
 
         public async Task AddForkliftAsync(Forklift forklift)
         {
-            context.Forklifts.Add(forklift);
-            await context.SaveChangesAsync();
+            try
+            {
+                context.Forklifts.Add(forklift);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+
+                /*Encountered a problem while testing where if I purposefully try to add a forklift with an id that already exists, 
+                 an InvalidOperationException or DbUpdateException would get thrown, but after catching and handling this exception, I
+                could not add new forklifts with Ids that dont exist in the database, because for some reason the context was still
+                trying to add the forklift with the id that originally causes the exception. A fix that worked for me was disposing of the context and 
+                making it anew, another possible solution which may be explored is querying the db to see if an id already exists prior to insertion*/
+
+                context.Dispose();
+                context = new PalletSyncDbContext();
+
+                // This throws the exception up the call stack so that it can be caught again in the forkliftController class, and return an appropriate
+                // message back to the person making the request
+                throw ex;
+            }
         }
 
         public async Task<object> SearchForkliftsAsync(SearchForklift query)
@@ -44,12 +66,13 @@ public class ForkliftService: IForkliftService
                          select new
                          {
                              id = forklift.Id,
-                             lastUser = $"{user.FirstName} {user.LastName}",
-                             lastPallet = forklift.LastPalletId,
+                             lastUserId = user.Id,
+                             lastUser = user != null ? $"{user.FirstName} {user.LastName}" : null,
+                             lastPallet = forklift.LastPalletId
                          };
 
-            return await dbQuery.ToListAsync();
-            // Hey check it out Kacper, no need for making a list of objects with some new class, this works just fine!
+            var forklifts = await dbQuery.ToListAsync();
+            return WrapListOfForklifts(forklifts);
         }
 
         public async Task<object> GetForkliftById(string id)
@@ -62,11 +85,35 @@ public class ForkliftService: IForkliftService
                           select new
                           {
                               id = forklift.Id,
-                              lastUser = $"{user.FirstName} {user.LastName}",
-                              lastPallet = forklift.LastPalletId,
+                              lastUserId = user.Id,
+                              lastUser = user != null ? $"{user.FirstName} {user.LastName}" : null,
+                              lastPallet = forklift.LastPalletId
                           };
 
-            return await dbQuery.FirstOrDefaultAsync();
+            var result = await dbQuery.FirstOrDefaultAsync();
+            return result;
+        }
+
+        public async Task<bool> DeleteObjectById(string id)
+        {
+            var forkliftToDelete = await context.Forklifts.FindAsync(id);
+
+            if (forkliftToDelete != null)
+            {
+                context.Forklifts.Remove(forkliftToDelete);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        private object WrapListOfForklifts(object forklifts)
+        {
+            var forkliftWrapper = new
+            {
+                forklifts
+            };
+            return forkliftWrapper;
         }
 
     }
