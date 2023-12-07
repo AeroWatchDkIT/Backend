@@ -7,7 +7,8 @@ namespace PalletSyncApi.Services
         public Task<object> GetAllForkliftsAsync();
         public Task AddForkliftAsync(Forklift forklift);
         public Task<object> SearchForkliftsAsync(SearchForklift query);
-        public Task<object> GetForkliftById(string id);
-        public Task<bool> DeleteObjectById(string id);
+        public Task<object> GetForkliftByIdAsync(string id);
+        public Task<bool> DeleteObjectByIdAsync(string id);
+        public Task<bool> UpdateForkliftByIdAsync(string newId, string oldId);
     }
 }

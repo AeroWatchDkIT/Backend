@@ -6,7 +6,7 @@ namespace PalletSyncApi.Classes
     {
         [Required]
         [Regex(@"^F-[0-9]+$", ErrorMessage = "ID must be in the F-1234 format")]
-        [StringLength(450, ErrorMessage = "The search term must be 450 characters or less.")]
+        [StringLength(450, ErrorMessage = "The id must be 450 characters or less.")]
         public string Id { get; set; }
         public string? LastUserId { get; set; }
         public User? LastUser { get; set; }

@@ -75,7 +75,7 @@ public class ForkliftService: IForkliftService
             return WrapListOfForklifts(forklifts);
         }
 
-        public async Task<object> GetForkliftById(string id)
+        public async Task<object> GetForkliftByIdAsync(string id)
         {
 
             var dbQuery = from forklift in context.Forklifts
@@ -94,7 +94,7 @@ public class ForkliftService: IForkliftService
             return result;
         }
 
-        public async Task<bool> DeleteObjectById(string id)
+        public async Task<bool> DeleteObjectByIdAsync(string id)
         {
             var forkliftToDelete = await context.Forklifts.FindAsync(id);
 
@@ -103,6 +103,37 @@ public class ForkliftService: IForkliftService
                 context.Forklifts.Remove(forkliftToDelete);
                 await context.SaveChangesAsync();
                 return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> UpdateForkliftByIdAsync(string newId, string oldId)
+        {
+            var forkliftToUpdate = await context.Forklifts.FindAsync(oldId);
+
+            if (forkliftToUpdate != null)
+            {
+                var newForklift = new Forklift
+                {
+                    Id = newId,
+                    LastUserId = forkliftToUpdate.LastUserId,
+                    LastPalletId = forkliftToUpdate.LastPalletId
+                };
+                try
+                {
+                    context.Forklifts.Remove(forkliftToUpdate);
+                    context.Forklifts.Add(newForklift);
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+
+                    context.Dispose();
+                    context = new PalletSyncDbContext();
+                    throw ex;
+                }
             }
             return false;
         }
