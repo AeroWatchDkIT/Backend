@@ -2,6 +2,9 @@
 using PalletSyncApi.Services;
 using System.Text.Json;
 using PalletSyncApi.Classes;
+using Microsoft.EntityFrameworkCore;
+using System.Net.NetworkInformation;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PalletSyncApi.Controllers
 {
@@ -18,7 +21,7 @@ namespace PalletSyncApi.Controllers
         }
 
 
-        [HttpGet(Name = "Forklifts")]
+        [HttpGet]
         public async Task<IActionResult> GetForklifts()
         {
             try
@@ -27,11 +30,12 @@ namespace PalletSyncApi.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return StatusCode(500);
             }
         }
 
-        [HttpPost(Name = "Forklifts")]
+        [HttpPost]
         public async Task<IActionResult> AddForklift([FromBody] Forklift forklift)
         {
             if (!ModelState.IsValid || string.IsNullOrEmpty(forklift.Id))
@@ -45,24 +49,118 @@ namespace PalletSyncApi.Controllers
                 await _forkliftService.AddForkliftAsync(forklift);
                 return StatusCode(201);
             } 
-            catch(InvalidOperationException) {
-                return BadRequest($"Forklift with Id {forklift.Id} already exists!");
+            catch(Exception ex) when (ex is InvalidOperationException || ex is DbUpdateException) {
+
+                var errorResponse = new ErrorResponse
+                {
+                    Title = "One or more validation errors occurred.",
+                    Status = 400,
+                    Errors = new Dictionary<string, string[]>
+                    {
+                        { "Id", new[] { $"Forklift with Id {forklift.Id} already exists!" } }
+                    }
+                };
+
+                return BadRequest(errorResponse);
             }
             catch (Exception ex){
-                return BadRequest(ex);
+                return StatusCode(500, ex);
             }
         }
 
-        [HttpPut(Name = "Forklifts")]
-        public async Task<IActionResult> Put()
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchForklifts([FromQuery] SearchForklift query)
         {
-            return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                return Ok(await _forkliftService.SearchForkliftsAsync(query));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
         }
 
-        [HttpDelete(Name = "Forklifts")]
-        public async Task<IActionResult> Delete()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetForkliftById(string id)
         {
-            return Ok();
+            try
+            {
+                var result = await _forkliftService.GetForkliftByIdAsync(id);
+                if(result != null)
+                {
+                    return Ok(result);
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
+            // Come back to this and figure out a decent way to validate the id
+        }
+
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateForkliftIdById([FromBody] Forklift forklift, string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                var updateSuccessful = await _forkliftService.UpdateForkliftByIdAsync(forklift.Id, id);
+                if (updateSuccessful)
+                {
+                    return Ok();
+                }
+                return NotFound();
+            }
+            catch (Exception ex) when (ex is InvalidOperationException || ex is DbUpdateException)
+            {
+
+                var errorResponse = new ErrorResponse
+                {
+                    Title = "One or more validation errors occurred.",
+                    Status = 400,
+                    Errors = new Dictionary<string, string[]>
+                    {
+                        { "Id", new[] { $"Forklift with Id {forklift.Id} already exists!" } }
+                    }
+                };
+
+                return BadRequest(errorResponse);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteForkliftById(string id)
+        {
+            try
+            {
+                bool forkliftDeleted = await _forkliftService.DeleteObjectByIdAsync(id);
+                if (forkliftDeleted)
+                {
+                    return Ok();
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
         }
 
         private Forklift sanitiseForkliftInput(Forklift forklift)
