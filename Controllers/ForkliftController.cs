@@ -69,7 +69,7 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> SearchForklifts([FromQuery] SearchForklift query)
+        public async Task<IActionResult> SearchForklifts([FromQuery] UniversalSearchTerm query)
         {
             if (!ModelState.IsValid)
             {

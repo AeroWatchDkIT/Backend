@@ -56,7 +56,7 @@ public class ForkliftService: IForkliftService
             }
         }
 
-        public async Task<object> SearchForkliftsAsync(SearchForklift query)
+        public async Task<object> SearchForkliftsAsync(UniversalSearchTerm query)
         {
 
             var dbQuery = from forklift in context.Forklifts

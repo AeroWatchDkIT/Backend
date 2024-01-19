@@ -9,5 +9,9 @@ namespace PalletSyncApi.Classes
         [StringLength(450, ErrorMessage = "The id must be 450 characters or less.")]
         public string Name { get; set; }
         public string Place { get; set; }
+        public PalletStatus()
+        {
+
+        }
     }
 }

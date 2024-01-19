@@ -20,6 +20,18 @@ namespace PalletSyncApi.Services
             return result;
         }
 
+        public async Task<object> SearchPalletStatusesAsync(UniversalSearchTerm query)
+        {
+
+            var dbQuery = context.Pallets
+                .Where(pallet => pallet.Id.ToString().Contains(query.SearchTerm))
+                .ToListAsync();
+
+            var palletStatuses = await dbQuery;
+            var result = await CreatePalletStatusResult(palletStatuses);
+            return result;
+        }
+
         private async Task<object> CreatePalletStatusResult(List<Pallet> pallets)
         {
             List<PalletStatus> statuses = new List<PalletStatus>();
