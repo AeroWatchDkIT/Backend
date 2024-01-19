@@ -16,17 +16,32 @@ namespace PalletSyncApi.Services
 
         public async Task AddShelfAsync(Shelf shelf)
         {
-            throw new NotImplementedException();
+            context.Shelves.Add(shelf);
+            await context.SaveChangesAsync();
         }
 
         public async Task UpdateShelfAsync(Shelf shelf)
         {
-            throw new NotImplementedException();
+            var dbShelf = await context.Shelves.FirstOrDefaultAsync(e => e.Id == shelf.Id);
+
+            if (dbShelf != null)
+            {
+                dbShelf.PalletId = shelf.PalletId;
+                dbShelf.Location = shelf.Location;
+            }
+
+            await context.SaveChangesAsync();
         }
 
         public async Task DeleteShelfAsync(string shelfId)
         {
-            throw new NotImplementedException();
+            var shelfToRemove = await context.Shelves.FirstOrDefaultAsync(p => p.Id == shelfId);
+
+            if (shelfToRemove != null)
+            {
+                context.Shelves.Remove(shelfToRemove);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }

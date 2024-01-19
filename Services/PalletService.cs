@@ -44,7 +44,7 @@ namespace PalletSyncApi.Services
             }
 
             if (palletToRemove != null) {
-                context.Remove(palletToRemove);
+                context.Pallets.Remove(palletToRemove);
                 await context.SaveChangesAsync();
             }
            

@@ -17,7 +17,7 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpGet(Name = "Shelves")]
-        public async Task<IActionResult> GetPallets()
+        public async Task<IActionResult> GetShelves()
         {
             try
             {
@@ -32,19 +32,52 @@ namespace PalletSyncApi.Controllers
         [HttpPost(Name = "Shelves")]
         public async Task<IActionResult> AddShelf([FromBody] Shelf shelf)
         {
-            throw new NotImplementedException();
+            if (!ModelState.IsValid || string.IsNullOrEmpty(shelf.Id))
+            {
+                return BadRequest("Invalid object!");
+            }
+
+            try
+            {
+                await _shelfService.AddShelfAsync(shelf);
+                return StatusCode(201);
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest($"Shelf with Id {shelf.Id} already exists!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         [HttpPut(Name = "Shelves")]
         public async Task<IActionResult> UpdateShelf(Shelf shelf)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _shelfService.UpdateShelfAsync(shelf);
+                return Ok($"Shelf {shelf.Id} has been successfully updated");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occured when trying to update shelf {shelf.Id}");
+            }
         }
 
         [HttpDelete(Name = "Shelves")]
         public async Task<IActionResult> DeleteShelf(string shelfId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _shelfService.DeleteShelfAsync(shelfId);
+                return Ok($"Shelf {shelfId} has been successfully deleted");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occured when trying to delete pallet {shelfId}");
+            }
         }
     }
 }
