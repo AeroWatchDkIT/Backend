@@ -42,6 +42,28 @@ namespace PalletSyncApi.Services
             return user;
         }
 
+        public async Task<bool> DeleteUserByIdAsync(string id)
+        {
+            var userToDelete = await context.Users.FindAsync(id);
+            var relatedForklifts = await context.Forklifts.Where(f => f.LastUserId == id).ToListAsync();
+
+            if (userToDelete != null)
+            {
+                if (relatedForklifts.Count > 0)
+                {
+                    foreach (var forklift in  relatedForklifts)
+                    {
+                        forklift.LastUserId = null;
+                    }
+                }
+
+                context.Users.Remove(userToDelete);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
         private object Wrap(object users)
         {
             var wrapper = new

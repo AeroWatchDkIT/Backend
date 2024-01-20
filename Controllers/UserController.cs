@@ -81,5 +81,26 @@ namespace PalletSyncApi.Controllers
                 return StatusCode(500);
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserById(string id)
+        {
+            try
+            {
+                bool userDeleted = await _userService.DeleteUserByIdAsync(id);
+                if (userDeleted)
+                {
+                    return Ok();
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
+        }
+
+
     }
 }
