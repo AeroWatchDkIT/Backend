@@ -52,7 +52,7 @@ public class ForkliftService: IForkliftService
 
                 // This throws the exception up the call stack so that it can be caught again in the forkliftController class, and return an appropriate
                 // message back to the person making the request
-                throw ex;
+                throw;
             }
         }
 

@@ -1,18 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PalletSyncApi.Services;
-using System.Text.Json;
-using PalletSyncApi.Classes;
 using Microsoft.EntityFrameworkCore;
-using System.Net.NetworkInformation;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
+using PalletSyncApi.Classes;
+using PalletSyncApi.Services;
 namespace PalletSyncApi.Controllers
 {
     [ApiController]
     [Route("Users")]
     public class UserController : ControllerBase
     {
-
         private readonly IUserService _userService;
 
         public UserController(IUserService userService)
@@ -31,6 +26,40 @@ namespace PalletSyncApi.Controllers
             {
                 Console.WriteLine(ex);
                 return StatusCode(500);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddUser([FromBody] User user)
+        {
+            if (!ModelState.IsValid || string.IsNullOrEmpty(user.Id))
+            {
+                return BadRequest("Invalid object!");
+            }
+
+            try
+            {
+                await _userService.AddUserAsync(user);
+                return StatusCode(201);
+            }
+            catch (Exception ex) when (ex is InvalidOperationException || ex is DbUpdateException)
+            {
+
+                var errorResponse = new ErrorResponse
+                {
+                    Title = "One or more validation errors occurred.",
+                    Status = 400,
+                    Errors = new Dictionary<string, string[]>
+                    {
+                        { "Id", new[] { $"User with Id {user.Id} already exists!" } }
+                    }
+                };
+
+                return BadRequest(errorResponse);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
             }
         }
     }

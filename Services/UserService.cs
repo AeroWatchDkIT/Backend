@@ -16,6 +16,22 @@ namespace PalletSyncApi.Services
             // the reason for wrapping is https://youtu.be/60F8rzP5nQo?si=istwlDOjK0S2XtJO&t=295
         }
 
+        public async Task AddUserAsync(User user)
+        {
+            try
+            {
+                context.Users.Add(user);
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                context.Dispose();
+                context = new PalletSyncDbContext();
+                throw;
+            }
+        }
+
         private object Wrap(object users)
         {
             var wrapper = new
