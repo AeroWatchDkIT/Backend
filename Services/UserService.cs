@@ -64,6 +64,37 @@ namespace PalletSyncApi.Services
             return false;
         }
 
+        public async Task<bool> UpdateUserAsync(User user)
+        {
+            var userToUpdate = await context.Users.FindAsync(user.Id);
+
+            if (userToUpdate != null)
+            {
+                try
+                {
+                    userToUpdate.Id = user.Id;
+                    userToUpdate.UserType = user.UserType;
+                    userToUpdate.FirstName = user.FirstName;
+                    userToUpdate.LastName = user.LastName;
+                    userToUpdate.Passcode = user.Passcode;
+                    userToUpdate.ForkliftCertified = user.ForkliftCertified;
+                    userToUpdate.IncorrectPalletPlacements = user.IncorrectPalletPlacements;
+
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+
+                    context.Dispose();
+                    context = new PalletSyncDbContext();
+                    throw;
+                }
+            }
+            return false;
+        }
+
         private object Wrap(object users)
         {
             var wrapper = new

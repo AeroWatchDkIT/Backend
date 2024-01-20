@@ -9,6 +9,6 @@ namespace PalletSyncApi.Services
         ////public Task<object> SearchUsersAsync(SearchUser query);
         public Task<object> GetUserByIdAsync(string id);
         public Task<bool> DeleteUserByIdAsync(string id);
-        //public Task<bool> UpdateUser(string newId, string oldId);
+        public Task<bool> UpdateUserAsync(User user);
     }
 }

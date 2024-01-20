@@ -102,5 +102,40 @@ namespace PalletSyncApi.Controllers
         }
 
 
+        [HttpPut]
+        public async Task<IActionResult> UpdateUserById(User user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                var updateSuccessful = await _userService.UpdateUserAsync(user);
+                if (updateSuccessful)
+                {
+                    return Ok();
+                }
+                return NotFound();
+            }
+            catch (Exception ex) when (ex is InvalidOperationException || ex is DbUpdateException)
+            {
+
+                var errorResponse = new ErrorResponse
+                {
+                    Title = "One or more validation errors occurred.",
+                    Status = 400,
+                    Errors = new Dictionary<string, string[]> { 
+                        { "Exception Message", new[] { ex.Message } }
+                    }
+                };
+
+                return BadRequest(errorResponse);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
     }
 }
