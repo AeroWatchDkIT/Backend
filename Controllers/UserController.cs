@@ -15,7 +15,5 @@ namespace PalletSyncApi.Controllers
 
         private readonly IUserService _userService;
 
-       
-
     }
 }

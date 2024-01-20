@@ -8,10 +8,10 @@ namespace PalletSyncApi.Services
     {
         PalletSyncDbContext context = new PalletSyncDbContext();
 
-        public async Task<List<Shelf>> GetAllShelvesAsync()
+        public async Task<object> GetAllShelvesAsync()
         {
             var shelves = await context.Shelves.ToListAsync();
-            return shelves;
+            return WrapShelfList(shelves);
         }
 
         public async Task AddShelfAsync(Shelf shelf)
@@ -42,6 +42,15 @@ namespace PalletSyncApi.Services
                 context.Shelves.Remove(shelfToRemove);
                 await context.SaveChangesAsync();
             }
+        }
+
+        private object WrapShelfList(object shelves)
+        {
+            var shelfWrapper = new
+            {
+                shelves
+            };
+            return shelfWrapper;
         }
     }
 }
