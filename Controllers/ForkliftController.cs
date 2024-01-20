@@ -12,7 +12,6 @@ namespace PalletSyncApi.Controllers
     [Route("Forklifts")]
     public class ForkliftController : ControllerBase
     {
-
         private readonly IForkliftService _forkliftService;
 
         public ForkliftController(IForkliftService forkliftService)
