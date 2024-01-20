@@ -16,10 +16,14 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPalletStatuses()
+        public async Task<IActionResult> GetAllPalletStatuses([FromQuery] Filter? filterTerm)
         {
             try
             {
+                if (filterTerm.HasValue == true)
+                {
+                    return Ok(await _palletStatusService.GetAllPalletStatusesAsync(filterTerm));
+                }
                 return Ok(await _palletStatusService.GetAllPalletStatusesAsync());
             }
             catch (Exception ex)
@@ -46,6 +50,10 @@ namespace PalletSyncApi.Controllers
                 return StatusCode(500);
             }
         }
+
+
+
+
 
     }
 }

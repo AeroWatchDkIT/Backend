@@ -2,6 +2,7 @@
 using PalletSyncApi.Services;
 using System.Text.Json;
 using PalletSyncApi.Classes;
+using PalletSyncApi.Enums;
 
 namespace PalletSyncApi.Controllers
 {
@@ -39,6 +40,7 @@ namespace PalletSyncApi.Controllers
 
             try
             {
+                pallet.State = PalletState.New;
                 await _palletService.AddPalletAsync(pallet);
                 return StatusCode(201);
             }

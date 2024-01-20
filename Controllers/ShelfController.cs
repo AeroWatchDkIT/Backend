@@ -2,6 +2,8 @@
 using PalletSyncApi.Services;
 using System.Text.Json;
 using PalletSyncApi.Classes;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 
 namespace PalletSyncApi.Controllers
 {
@@ -32,13 +34,48 @@ namespace PalletSyncApi.Controllers
         [HttpPost(Name = "Shelves")]
         public async Task<IActionResult> AddShelf([FromBody] Shelf shelf)
         {
-            throw new NotImplementedException();
+            if (!ModelState.IsValid || string.IsNullOrEmpty(shelf.Id))
+            {
+                return BadRequest("Invalid object!");
+            }
+
+            try
+            {
+                await _shelfService.AddShelfAsync(shelf);
+                return StatusCode(201);
+            }
+            catch (Exception ex) when (ex is InvalidOperationException || ex is DbUpdateException)
+            {
+                    var errorResponse = new ErrorResponse
+                    {
+                        Title = "One or more validation errors occurred.",
+                        Status = 400,
+                        Errors = new Dictionary<string, string[]>
+                    {
+                        { "Id", new[] { ex.InnerException.Message } }
+                    }
+                    };
+                    return BadRequest(errorResponse);
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
         }
 
         [HttpPut(Name = "Shelves")]
         public async Task<IActionResult> UpdateShelf(Shelf shelf)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _shelfService.UpdateShelfAsync(shelf);
+                return Ok($"Shelf {shelf.Id} has been successfully updated");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occured when trying to update shelf {shelf.Id}");
+            }
         }
 
         [HttpDelete(Name = "Shelves")]
