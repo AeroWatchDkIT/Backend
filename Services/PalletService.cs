@@ -8,10 +8,10 @@ namespace PalletSyncApi.Services
     {
         PalletSyncDbContext context = new PalletSyncDbContext();
 
-        public async Task<List<Pallet>> GetAllPalletsAsync()
+        public async Task<object> GetAllPalletsAsync()
         {
             var pallets = await context.Pallets.ToListAsync();
-            return pallets;
+            return WrapPalletList(pallets);
         }
 
         public async Task AddPalletAsync(Pallet pallet)
@@ -48,6 +48,14 @@ namespace PalletSyncApi.Services
                 await context.SaveChangesAsync();
             }
            
+        }
+        private object WrapPalletList(object pallets)
+        {
+            var palletWrapper = new
+            {
+                pallets
+            };
+            return palletWrapper;
         }
     }
 }
