@@ -32,6 +32,16 @@ namespace PalletSyncApi.Services
             }
         }
 
+        public async Task<object> GetUserByIdAsync(string id)
+        {
+            var user = await context.Users
+                .Where(u => u.Id == id)
+                .Select(u => new { u.Id, u.UserType, u.FirstName, u.LastName, u.ForkliftCertified, u.IncorrectPalletPlacements })
+                .FirstOrDefaultAsync();
+
+            return user;
+        }
+
         private object Wrap(object users)
         {
             var wrapper = new

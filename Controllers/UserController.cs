@@ -62,5 +62,24 @@ namespace PalletSyncApi.Controllers
                 return StatusCode(500, ex);
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(string id)
+        {
+            try
+            {
+                var result = await _userService.GetUserByIdAsync(id);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
+        }
     }
 }
