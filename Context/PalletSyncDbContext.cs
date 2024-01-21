@@ -77,6 +77,48 @@ namespace PalletSyncApi.Context
                 new Forklift { Id = "F-0205", LastUserId = "U-0003", LastPalletId = "P-0001" },
                 new Forklift { Id = "F-0016", LastUserId = "U-0003", LastPalletId = "P-0005" }
                 );
+
+            modelBuilder.Entity<PalletTrackingLog>()
+                .HasOne(ptl => ptl.Pallet)
+                .WithMany()
+                .HasForeignKey(ptl => ptl.PalletId)
+                .IsRequired(true);
+
+            modelBuilder.Entity<PalletTrackingLog>()
+                .HasOne(ptl => ptl.Forklift)
+                .WithMany()
+                .HasForeignKey(ptl => ptl.ForkliftId)
+                .IsRequired(true);
+
+            modelBuilder.Entity<PalletTrackingLog>()
+               .HasOne(ptl => ptl.User)
+               .WithMany()
+               .HasForeignKey(ptl => ptl.UserId)
+               .IsRequired(true);
+
+            modelBuilder.Entity<PalletTrackingLog>().HasData(
+                new PalletTrackingLog { 
+                    Id = 1, 
+                    DateTime = DateTime.UtcNow,
+                    Action = "Forklift F-0012 placed pallet P-0001 on shelf S-0001 in Warehouse A by user U-0001",
+                    PalletId = "P-0001",
+                    PalletState = PalletState.Shelf,
+                    PalletLocation = "Warehouse A",
+                    ForkliftId = "F-0012",
+                    UserId = "U-0001"
+                },
+                new PalletTrackingLog
+                {
+                    Id = 2,
+                    DateTime = DateTime.UtcNow,
+                    Action = "Forklift F-0007 placed pallet P-0002 on the floor in Warehouse B by user U-0002",
+                    PalletId = "P-0002",
+                    PalletState = PalletState.Floor,
+                    PalletLocation = "Warehouse B",
+                    ForkliftId = "F-0007",
+                    UserId = "U-0002"
+                }
+                );
         }
     }
 }

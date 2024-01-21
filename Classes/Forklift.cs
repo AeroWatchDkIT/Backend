@@ -12,7 +12,5 @@ namespace PalletSyncApi.Classes
         public User? LastUser { get; set; }
         public string? LastPalletId { get; set; }
         public Pallet? LastPallet { get; set; }
-
-
     }
 }
