@@ -19,7 +19,7 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpGet(Name = "Shelves")]
-        public async Task<IActionResult> GetPallets()
+        public async Task<IActionResult> GetShelves()
         {
             try
             {
@@ -41,6 +41,8 @@ namespace PalletSyncApi.Controllers
 
             try
             {
+                shelf.Pallet = null;
+                shelf.PalletId = null; //We dont want these 2 set from the create endpoint
                 await _shelfService.AddShelfAsync(shelf);
                 return StatusCode(201);
             }
@@ -69,6 +71,7 @@ namespace PalletSyncApi.Controllers
         {
             try
             {
+                shelf.Pallet = null; //Dont want this set from outside
                 await _shelfService.UpdateShelfAsync(shelf);
                 return Ok($"Shelf {shelf.Id} has been successfully updated");
             }

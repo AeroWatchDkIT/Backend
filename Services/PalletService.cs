@@ -46,12 +46,10 @@ namespace PalletSyncApi.Services
                 containerShelf.PalletId = null;
                 await context.SaveChangesAsync();
             }
-
             if (palletToRemove != null) {
                 context.Remove(palletToRemove);
                 await context.SaveChangesAsync();
             }
-           
         }
     }
 }

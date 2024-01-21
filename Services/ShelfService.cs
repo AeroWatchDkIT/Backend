@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
 using System.Data;
@@ -24,41 +25,36 @@ namespace PalletSyncApi.Services
             context.Shelves.Add(shelf);
             await context.SaveChangesAsync();
         }
-
-
-
-
-
         public async Task UpdateShelfAsync(Shelf shelf)
         {
+            // This currently is hardwired to work in the following way:
+            // You pick a shelf with a null PalletId, assign a pallet Id to it
+            // Mimicking a forklift placing a pallet in an empty shelf
+            // And the pallet's state will be set to Shelf
+            // At a later point we will have to deal with the case of trying
+            // To place a pallet in a shelf thats already occupied and denying it
+            // as well as taking a pallet out of a shelf
+
             context = util.RemakeContext(context);
             string connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = PalletSyncDB";
             string storedProcedureName = "dbo.ShelvePallet";
 
-            // Create a SqlConnection using the connection string
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                // Open the connection
                 connection.Open();
 
-                // Create a SqlCommand for the stored procedure
                 using (SqlCommand command = new SqlCommand(storedProcedureName, connection))
                 {
-                    // Specify that it's a stored procedure
                     command.CommandType = CommandType.StoredProcedure;
-
-                    // Add parameters if your stored procedure has any
                     command.Parameters.AddWithValue("@PalletId", shelf.PalletId);
                     command.Parameters.AddWithValue("@ShelfId", shelf.Id);
 
                     try
                     {
-                        // Execute the stored procedure
                         var result = command.ExecuteNonQuery();
                         if(result == 1)
                         {
-                            throw new ApplicationException("We fucked up foo");
-
+                            throw new ApplicationException("Whoops, something went wrong...");
                         }
                     }
                     catch (Exception ex)

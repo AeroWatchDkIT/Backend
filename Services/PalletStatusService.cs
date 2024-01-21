@@ -26,13 +26,33 @@ namespace PalletSyncApi.Services
         {
             context = util.RemakeContext(context);
             var dbQuery = SelectAppropriateQuery(filterTerm);
+            var palletStatuses = await dbQuery.ToListAsync();
+            var result = await CreatePalletStatusResult(palletStatuses);
+            return result;
+        }
+        public async Task<object> SearchPalletStatusesAsync(string searchTerm)
+        {
+            context = util.RemakeContext(context);
 
+            var dbQuery = context.Pallets
+                .Where(pallet => pallet.Id.ToString().Contains(searchTerm))
+                .ToListAsync();
+
+            var palletStatuses = await dbQuery;
+            var result = await CreatePalletStatusResult(palletStatuses);
+            return result;
+        }
+
+        public async Task<object> SearchPalletStatusesAsync(string searchTerm, Filter? filterTerm)
+        {
+            context = util.RemakeContext(context);
+            var dbQuery = SelectAppropriateQuery(filterTerm, searchTerm);
             var palletStatuses = await dbQuery.ToListAsync();
             var result = await CreatePalletStatusResult(palletStatuses);
             return result;
         }
 
-         private IQueryable<Pallet> SelectAppropriateQuery(Filter? filterTerm, string searchTerm = "")
+        private IQueryable<Pallet> SelectAppropriateQuery(Filter? filterTerm, string searchTerm = "")
         {
             switch (filterTerm)
             {
@@ -62,12 +82,11 @@ namespace PalletSyncApi.Services
         private IQueryable<Pallet> GetAllMisplacedPallets(string searchTerm = "")
         {
             // This method gets either all misplaced pallets or all misplaced pallets who's id contains a search term
-
             var dbQuery = from pallet in context.Pallets
                           join shelf in context.Shelves on pallet.Id equals shelf.PalletId
                           where pallet.Id.Substring(2) != shelf.Id.Substring(2)
                           && ((searchTerm != null && !string.IsNullOrEmpty(searchTerm)) ? (pallet.Id.ToString().Contains(searchTerm)) : true)
-                          select pallet;
+                          select pallet; 
 
             return dbQuery;
         }
@@ -75,7 +94,6 @@ namespace PalletSyncApi.Services
         private IQueryable<Pallet> GetAllInPlacePallets(string searchTerm = "")
         {
             // This method gets either all In Place pallets or all misplaced pallets who's id contains a search term
-
             var dbQuery = from pallet in context.Pallets
                           join shelf in context.Shelves on pallet.Id equals shelf.PalletId
                           where pallet.Id.Substring(2) == shelf.Id.Substring(2)
@@ -105,30 +123,6 @@ namespace PalletSyncApi.Services
             return dbQuery;
         }
 
-
-        public async Task<object> SearchPalletStatusesAsync(string searchTerm)
-        {
-            context = util.RemakeContext(context);
-
-            var dbQuery = context.Pallets
-                .Where(pallet => pallet.Id.ToString().Contains(searchTerm))
-                .ToListAsync();
-
-            var palletStatuses = await dbQuery;
-            var result = await CreatePalletStatusResult(palletStatuses);
-            return result;
-        }
-
-        public async Task<object> SearchPalletStatusesAsync(string searchTerm, Filter? filterTerm)
-        {
-            context = util.RemakeContext(context);
-            var dbQuery = SelectAppropriateQuery(filterTerm, searchTerm);
-
-            var palletStatuses = await dbQuery.ToListAsync();
-            var result = await CreatePalletStatusResult(palletStatuses);
-            return result;
-        }
-
         private async Task<object> CreatePalletStatusResult(List<Pallet> pallets)
         {
             List<PalletStatus> statuses = new List<PalletStatus>();
@@ -136,29 +130,34 @@ namespace PalletSyncApi.Services
             foreach(var pallet in pallets)
             {
                 PalletStatus currentPalletStatus;
-
-                if (pallet.State.Equals(PalletState.Floor))
+                switch (pallet.State)
                 {
-                    // Think about this one, how we treat location, for example, is location always there or only there 
-                    // When a pallet is placed on the floor?
-                    currentPalletStatus = makeFloorPalletStatus(pallet);
+                    case PalletState.Floor:
+                        {
+                            // Think about this one, how we treat location, for example, is location always there or only there 
+                            // When a pallet is placed on the floor?
+                            currentPalletStatus = makeFloorPalletStatus(pallet);
+                            break;
+                        }
+                    case PalletState.Fork:
+                        {
+                            currentPalletStatus = makeInTransitPalletStatus(pallet);
+                            break;
+                        }
+                    case PalletState.Shelf:
+                        {
+                            currentPalletStatus = await makeShelvedPalletStatus(pallet);
+                            break;
+                        }
+                    default:
+                        {
+                            currentPalletStatus = makeMissingOrNewPalletStatus(pallet);
+                            break;
+                        }
                 }
-                else if (pallet.State.Equals(PalletState.Fork))
-                {
-                    currentPalletStatus = makeInTransitPalletStatus(pallet);
-                }
-                else if (pallet.State.Equals(PalletState.Shelf))
-                {
-                    currentPalletStatus = await makeShelvedPalletStatus(pallet);
-                }
-                else
-                {
-                    currentPalletStatus = makeMissingPalletStatus(pallet);
-                }
-
                 statuses.Add(currentPalletStatus);
             }
-            return WrapListOfPalletStatuses(statuses);
+            return util.WrapListOfEntities(statuses);
         }
 
 
@@ -174,10 +173,6 @@ namespace PalletSyncApi.Services
             palletStatus.Place = place;
             return palletStatus;
         }
-
-
-
-
         private PalletStatus makeInTransitPalletStatus(Pallet pallet)
         {
             PalletStatus palletStatus = preparePalletStatus(pallet);
@@ -186,7 +181,7 @@ namespace PalletSyncApi.Services
             palletStatus.Place = "Stevens Forklift";
             return palletStatus;
         }
-        private PalletStatus makeMissingPalletStatus(Pallet pallet)
+        private PalletStatus makeMissingOrNewPalletStatus(Pallet pallet)
         {
             PalletStatus palletStatus = preparePalletStatus(pallet);
             palletStatus.Place = pallet.State.ToString();
@@ -204,15 +199,6 @@ namespace PalletSyncApi.Services
             PalletStatus palletStatus = new PalletStatus();
             palletStatus.Name = pallet.Id;
             return palletStatus;
-        }
-
-        private object WrapListOfPalletStatuses(List<PalletStatus> palletStatuses)
-        {
-            var palletStatusWrapper = new
-            {
-                palletStatuses
-            };
-            return palletStatusWrapper;
         }
     }
 }

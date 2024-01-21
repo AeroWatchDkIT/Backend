@@ -29,17 +29,13 @@ namespace PalletSyncApi.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return StatusCode(500);
+                return StatusCode(500, ex);
             }
         }
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchPalletStatuses([FromQuery] UniversalSearchTerm query, [FromQuery] Filter? filterTerm)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
             try
             {
                 if (filterTerm.HasValue == true)
@@ -51,13 +47,8 @@ namespace PalletSyncApi.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return StatusCode(500);
+                return StatusCode(500, ex);
             }
         }
-
-
-
-
-
     }
 }

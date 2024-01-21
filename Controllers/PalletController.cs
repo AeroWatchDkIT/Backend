@@ -40,7 +40,7 @@ namespace PalletSyncApi.Controllers
 
             try
             {
-                pallet.State = PalletState.New;
+                pallet.State = PalletState.New; // We dont want to allow any other state at this point, has to start as NEW
                 await _palletService.AddPalletAsync(pallet);
                 return StatusCode(201);
             }
