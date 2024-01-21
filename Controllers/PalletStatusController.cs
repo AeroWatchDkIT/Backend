@@ -34,7 +34,7 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> SearchPalletStatuses([FromQuery] UniversalSearchTerm query)
+        public async Task<IActionResult> SearchPalletStatuses([FromQuery] UniversalSearchTerm query, [FromQuery] Filter? filterTerm)
         {
             if (!ModelState.IsValid)
             {
@@ -42,7 +42,11 @@ namespace PalletSyncApi.Controllers
             }
             try
             {
-                return Ok(await _palletStatusService.SearchPalletStatusesAsync(query));
+                if (filterTerm.HasValue == true)
+                {
+                    return Ok(await _palletStatusService.SearchPalletStatusesAsync(query.SearchTerm, filterTerm));
+                }
+                return Ok(await _palletStatusService.SearchPalletStatusesAsync(query.SearchTerm));
             }
             catch (Exception ex)
             {

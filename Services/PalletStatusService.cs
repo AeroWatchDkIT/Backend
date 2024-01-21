@@ -3,6 +3,7 @@ using PalletSyncApi.Context;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Enums;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 
 namespace PalletSyncApi.Services
@@ -26,91 +27,104 @@ namespace PalletSyncApi.Services
             context = util.RemakeContext(context);
             var dbQuery = SelectAppropriateQuery(filterTerm);
 
-            /*var dbQuery = from user in context.Users
-                          join forklift in context.Forklifts on user.Id equals forklift.LastUserId
-                          join pallet in context.Pallets on forklift.LastPalletId equals pallet.Id
-                          join shelf in context.Shelves on pallet.Id equals shelf.PalletId
-                          select new
-                          {
-                              palletId = pallet.Id,
-                              shelfId = shelf.Id,
-                              shelfChild = shelf.PalletId
-                              //lastUserOnForklift = user != null ? $"{user.FirstName} {user.LastName}" : null,
-                          };*/
-
-
-            
-
-            //dbQuery = dbQuery.Where(result => result.palletId != result.shelfChild);
-
             var palletStatuses = await dbQuery.ToListAsync();
             var result = await CreatePalletStatusResult(palletStatuses);
             return result;
         }
 
-         private IQueryable<Pallet> SelectAppropriateQuery(Filter? filterTerm, UniversalSearchTerm searchTerm = null)
+         private IQueryable<Pallet> SelectAppropriateQuery(Filter? filterTerm, string searchTerm = "")
         {
             switch (filterTerm)
             {
                 case Filter.Misplaced:
                     {
-                        //query = query.Where(pallet => pallet.Id.ToString().Contains(x));
-
-                        //query = query.Where(shelf => shelf.PalletId == pallet.Id)
-                        //.Select(shelf => shelf.Id)
-                        //.FirstOrDefaultAsync();
-
-                        //.Where(shelf => shelf.PalletId == pallet.Id)
-                        //.Select(shelf => shelf.Id)
-                        //.FirstOrDefaultAsync();
-                        return GetAllMisplacedPallets(filterTerm, searchTerm = null);
+                        return GetAllMisplacedPallets(searchTerm);
                     }
-                /*case Filter.InPlace:
+                case Filter.InPlace:
                     {
-                        break;
+                        return GetAllInPlacePallets(searchTerm);
                     }
                 case Filter.OnFloor:
                     {
-                        break;
+                        return GetAllFloorPallets(searchTerm);
                     }
                 case Filter.Missing:
                     {
-                        break;
+                        return GetAllMissingPallets(searchTerm);
                     }
-                case Filter.InTransit:
+                default:
                     {
-                        break;
-                    }*/
+                        return null;
+                    }
             }
-            return null;
         }
 
-        private IQueryable<Pallet> GetAllMisplacedPallets(Filter? filterTerm, UniversalSearchTerm searchTerm = null)
+        private IQueryable<Pallet> GetAllMisplacedPallets(string searchTerm = "")
         {
-            /*var dbQuery = from pallet in context.Pallets
-                          join shelf in context.Shelves on pallet.Id.Substring(2) equals shelf.PalletId.Substring(2)
-                          where pallet.Id != shelf.PalletId
-                          && ((searchTerm != null && !string.IsNullOrEmpty(searchTerm.SearchTerm)) ? (pallet.Id.ToString().Contains(searchTerm.SearchTerm)) : true)
-                          select pallet;*/
+            // This method gets either all misplaced pallets or all misplaced pallets who's id contains a search term
 
             var dbQuery = from pallet in context.Pallets
                           join shelf in context.Shelves on pallet.Id equals shelf.PalletId
                           where pallet.Id.Substring(2) != shelf.Id.Substring(2)
+                          && ((searchTerm != null && !string.IsNullOrEmpty(searchTerm)) ? (pallet.Id.ToString().Contains(searchTerm)) : true)
+                          select pallet;
+
+            return dbQuery;
+        }
+
+        private IQueryable<Pallet> GetAllInPlacePallets(string searchTerm = "")
+        {
+            // This method gets either all In Place pallets or all misplaced pallets who's id contains a search term
+
+            var dbQuery = from pallet in context.Pallets
+                          join shelf in context.Shelves on pallet.Id equals shelf.PalletId
+                          where pallet.Id.Substring(2) == shelf.Id.Substring(2)
+                          && ((searchTerm != null && !string.IsNullOrEmpty(searchTerm)) ? (pallet.Id.ToString().Contains(searchTerm)) : true)
+                          select pallet;
+
+            return dbQuery;
+        }
+
+        private IQueryable<Pallet> GetAllFloorPallets(string searchTerm = "")
+        {
+            var dbQuery = from pallet in context.Pallets
+                          where pallet.State == PalletState.Floor
+                          && ((searchTerm != null && !string.IsNullOrEmpty(searchTerm)) ? (pallet.Id.ToString().Contains(searchTerm)) : true)
+                          select pallet;
+
+            return dbQuery;
+        }
+
+        private IQueryable<Pallet> GetAllMissingPallets(string searchTerm = "")
+        {
+            var dbQuery = from pallet in context.Pallets
+                          where pallet.State == PalletState.Missing
+                          && ((searchTerm != null && !string.IsNullOrEmpty(searchTerm)) ? (pallet.Id.ToString().Contains(searchTerm)) : true)
                           select pallet;
 
             return dbQuery;
         }
 
 
-        public async Task<object> SearchPalletStatusesAsync(UniversalSearchTerm query)
+        public async Task<object> SearchPalletStatusesAsync(string searchTerm)
         {
             context = util.RemakeContext(context);
 
             var dbQuery = context.Pallets
-                .Where(pallet => pallet.Id.ToString().Contains(query.SearchTerm))
+                .Where(pallet => pallet.Id.ToString().Contains(searchTerm))
                 .ToListAsync();
 
             var palletStatuses = await dbQuery;
+            var result = await CreatePalletStatusResult(palletStatuses);
+            return result;
+        }
+
+        public async Task<object> SearchPalletStatusesAsync(string searchTerm, Filter? filterTerm)
+        {
+            context = util.RemakeContext(context);
+            var dbQuery = SelectAppropriateQuery(filterTerm, searchTerm);
+
+            var palletStatuses = await dbQuery.ToListAsync();
             var result = await CreatePalletStatusResult(palletStatuses);
             return result;
         }

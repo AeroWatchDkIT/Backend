@@ -7,6 +7,7 @@ namespace PalletSyncApi.Services
     {
         public Task<object> GetAllPalletStatusesAsync(Filter? filterTerm);
         public Task<object> GetAllPalletStatusesAsync();
-        public Task<object> SearchPalletStatusesAsync(UniversalSearchTerm query);
+        public Task<object> SearchPalletStatusesAsync(string searchTerm, Filter? filterTerm);
+        public Task<object> SearchPalletStatusesAsync(string searchTerm);
     }
 }
