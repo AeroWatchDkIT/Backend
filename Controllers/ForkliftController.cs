@@ -65,7 +65,7 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> SearchForklifts([FromQuery] SearchForklift query)
+        public async Task<IActionResult> SearchForklifts([FromQuery] SearchQuery query)
         {
             if (!ModelState.IsValid)
             {

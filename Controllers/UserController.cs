@@ -137,5 +137,23 @@ namespace PalletSyncApi.Controllers
                 return StatusCode(500, ex);
             }
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchUsers([FromQuery] SearchQuery query)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                return Ok(await _userService.SearchUsersAsync(query));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
+        }
     }
 }
