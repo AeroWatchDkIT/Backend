@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
 using System.Data;
@@ -16,7 +15,7 @@ namespace PalletSyncApi.Services
         {
             context = util.RemakeContext(context);
             var shelves = await context.Shelves.ToListAsync();
-            return WrapShelfList(shelves);
+            return util.WrapListOfEntities(shelves);
         }
 
         public async Task AddShelfAsync(Shelf shelf)
@@ -25,7 +24,7 @@ namespace PalletSyncApi.Services
             context.Shelves.Add(shelf);
             await context.SaveChangesAsync();
         }
-        public async Task UpdateShelfAsync(Shelf shelf)
+        public async Task UpdateShelfHardwareAsync(Shelf shelf)
         {
             // This currently is hardwired to work in the following way:
             // You pick a shelf with a null PalletId, assign a pallet Id to it
@@ -52,7 +51,7 @@ namespace PalletSyncApi.Services
                     try
                     {
                         var result = command.ExecuteNonQuery();
-                        if(result == 1)
+                        if (result == 1)
                         {
                             throw new ApplicationException("Whoops, something went wrong...");
                         }
@@ -60,11 +59,12 @@ namespace PalletSyncApi.Services
                     catch (Exception ex)
                     {
                         Console.WriteLine("Error: " + ex.Message);
-                        throw ex;
+                        throw;
                     }
                 }
             }
-        public async Task UpdateShelfAsync(Shelf shelf)
+        }
+        public async Task UpdateShelfFrontendAsync(Shelf shelf)
         {
             var dbShelf = await context.Shelves.FirstOrDefaultAsync(e => e.Id == shelf.Id);
 
@@ -86,15 +86,6 @@ namespace PalletSyncApi.Services
                 context.Shelves.Remove(shelfToRemove);
                 await context.SaveChangesAsync();
             }
-        }
-
-        private object WrapShelfList(object shelves)
-        {
-            var shelfWrapper = new
-            {
-                shelves
-            };
-            return shelfWrapper;
         }
     }
 }

@@ -108,7 +108,7 @@ namespace PalletSyncApi.Services
             return false;
         }
 
-        public async Task<object> SearchUsersAsync(SearchQuery query)
+        public async Task<object> SearchUsersAsync(UniversalSearchTerm query)
         {
             
             var allUsers = await context.Users.ToListAsync();

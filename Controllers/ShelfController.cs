@@ -72,7 +72,7 @@ namespace PalletSyncApi.Controllers
             try
             {
                 shelf.Pallet = null; //Dont want this set from outside
-                await _shelfService.UpdateShelfAsync(shelf);
+                await _shelfService.UpdateShelfFrontendAsync(shelf); //We should have an if statement to determine if we should call Frontend version or Hardware version
                 return Ok($"Shelf {shelf.Id} has been successfully updated");
             }
             catch (Exception ex)

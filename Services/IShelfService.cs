@@ -6,7 +6,8 @@ namespace PalletSyncApi.Services
     {
         public Task<object> GetAllShelvesAsync();
         public Task AddShelfAsync(Shelf shelf);
-        public Task UpdateShelfAsync(Shelf shelf);
+        public Task UpdateShelfHardwareAsync(Shelf shelf);
+        public Task UpdateShelfFrontendAsync(Shelf shelf);
         public Task DeleteShelfAsync(string shelfId);
     }
 }
