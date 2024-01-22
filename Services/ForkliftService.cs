@@ -3,16 +3,17 @@ using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
 
 
-
 namespace PalletSyncApi.Services
 {
 
 public class ForkliftService: IForkliftService
     {
         PalletSyncDbContext context = new PalletSyncDbContext();
-        
+        GeneralUtilities util = new GeneralUtilities();
+
         public async Task<object> GetAllForkliftsAsync()
         {
+            context = util.RemakeContext(context);
             var dbQuery = from forklift in context.Forklifts
                         join user in context.Users on forklift.LastUserId equals user.Id into ps
                         from user in ps.DefaultIfEmpty()
@@ -25,13 +26,14 @@ public class ForkliftService: IForkliftService
                         };
 
             var forklifts = await dbQuery.ToListAsync();
-            return WrapListOfForklifts(forklifts);
+            return util.WrapListOfEntities(forklifts);
 
             // the reason for wrapping is https://youtu.be/60F8rzP5nQo?si=istwlDOjK0S2XtJO&t=295
         }
 
         public async Task AddForkliftAsync(Forklift forklift)
         {
+            context = util.RemakeContext(context);
             try
             {
                 context.Forklifts.Add(forklift);
@@ -56,9 +58,9 @@ public class ForkliftService: IForkliftService
             }
         }
 
-        public async Task<object> SearchForkliftsAsync(SearchQuery query)
+        public async Task<object> SearchForkliftsAsync(UniversalSearchTerm query)
         {
-
+            context = util.RemakeContext(context);
             var dbQuery = from forklift in context.Forklifts
                          join user in context.Users on forklift.LastUserId equals user.Id into ps
                          from user in ps.DefaultIfEmpty()
@@ -72,12 +74,12 @@ public class ForkliftService: IForkliftService
                          };
 
             var forklifts = await dbQuery.ToListAsync();
-            return WrapListOfForklifts(forklifts);
+            return util.WrapListOfEntities(forklifts);
         }
 
         public async Task<object> GetForkliftByIdAsync(string id)
         {
-
+            context = util.RemakeContext(context);
             var dbQuery = from forklift in context.Forklifts
                           join user in context.Users on forklift.LastUserId equals user.Id into ps
                           from user in ps.DefaultIfEmpty()
@@ -96,6 +98,7 @@ public class ForkliftService: IForkliftService
 
         public async Task<bool> DeleteObjectByIdAsync(string id)
         {
+            context = util.RemakeContext(context);
             var forkliftToDelete = await context.Forklifts.FindAsync(id);
 
             if (forkliftToDelete != null)
@@ -109,6 +112,7 @@ public class ForkliftService: IForkliftService
 
         public async Task<bool> UpdateForkliftByIdAsync(string newId, string oldId)
         {
+            context = util.RemakeContext(context);
             var forkliftToUpdate = await context.Forklifts.FindAsync(oldId);
 
             if (forkliftToUpdate != null)
@@ -138,14 +142,6 @@ public class ForkliftService: IForkliftService
             return false;
         }
 
-        private object WrapListOfForklifts(object forklifts)
-        {
-            var forkliftWrapper = new
-            {
-                forklifts
-            };
-            return forkliftWrapper;
-        }
 
     }
 }

@@ -96,6 +96,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IForkliftService, ForkliftService>();
 builder.Services.AddSingleton<IPalletService, PalletService>();
 builder.Services.AddSingleton<IShelfService, ShelfService>();
+builder.Services.AddSingleton<IPalletStatusService, PalletStatusService>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

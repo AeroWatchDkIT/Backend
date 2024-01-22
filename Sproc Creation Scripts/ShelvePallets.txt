@@ -1,0 +1,27 @@
+﻿Instructions to add this stored procedure: 
+Go to SQL Server Object Explorer, PalletSyncDB -> Programmability -> Stored Procedures. Right click "Stored Procedures" then click "Add new..."
+A tab will open, get rid of everything inside and paste the below code. Finally press update in the top left corner of the window and press "update database" in the pop up.
+
+
+CREATE PROCEDURE [dbo].[ShelvePallet]
+	@PalletId VARCHAR(450),
+	@ShelfId VARCHAR(450)
+AS
+	BEGIN
+	   BEGIN TRY
+			 BEGIN TRANSACTION;
+
+			 UPDATE dbo.Shelves SET PalletId = @PalletId WHERE Id = @ShelfId;
+			 UPDATE dbo.Pallets SET State = 2 WHERE Id = @PalletId;
+			 COMMIT;
+			 RETURN 0
+	   END TRY
+	   BEGIN CATCH
+        
+        ROLLBACK;
+
+        
+        SELECT ERROR_MESSAGE() AS ErrorMessage;
+		RETURN 1
+    END CATCH
+	END;

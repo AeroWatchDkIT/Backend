@@ -5,6 +5,7 @@
         Floor,
         Fork,
         Shelf,
-        Missing
+        Missing,
+        New
     }
 }

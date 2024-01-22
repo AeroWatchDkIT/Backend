@@ -2,6 +2,8 @@
 using PalletSyncApi.Services;
 using System.Text.Json;
 using PalletSyncApi.Classes;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 
 namespace PalletSyncApi.Controllers
 {
@@ -39,16 +41,28 @@ namespace PalletSyncApi.Controllers
 
             try
             {
+                shelf.Pallet = null;
+                shelf.PalletId = null; //We dont want these 2 set from the create endpoint
                 await _shelfService.AddShelfAsync(shelf);
                 return StatusCode(201);
             }
-            catch (InvalidOperationException)
+            catch (Exception ex) when (ex is InvalidOperationException || ex is DbUpdateException)
             {
-                return BadRequest($"Shelf with Id {shelf.Id} already exists!");
+                    var errorResponse = new ErrorResponse
+                    {
+                        Title = "One or more validation errors occurred.",
+                        Status = 400,
+                        Errors = new Dictionary<string, string[]>
+                    {
+                        { "Id", new[] { ex.InnerException.Message } }
+                    }
+                    };
+                    return BadRequest(errorResponse);
+                
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return StatusCode(500, ex);
             }
         }
 
@@ -57,6 +71,7 @@ namespace PalletSyncApi.Controllers
         {
             try
             {
+                shelf.Pallet = null; //Dont want this set from outside
                 await _shelfService.UpdateShelfAsync(shelf);
                 return Ok($"Shelf {shelf.Id} has been successfully updated");
             }
