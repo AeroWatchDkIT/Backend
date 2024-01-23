@@ -10,6 +10,7 @@ namespace PalletSyncApi.Context
         public DbSet<Pallet> Pallets { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Forklift> Forklifts { get; set; }
+        public DbSet<PalletTrackingLog> PalletTrackingLog { get; set; }
 
         public PalletSyncDbContext()
         {
