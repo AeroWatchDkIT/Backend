@@ -64,14 +64,16 @@ namespace PalletSyncApi.Services
                 }
             }
         }
-        public async Task UpdateShelfFrontendAsync(Shelf shelf)
+        public async Task UpdateShelfFrontendAsync(Shelf shelf, bool updateLoc = true)
         {
             var dbShelf = await context.Shelves.FirstOrDefaultAsync(e => e.Id == shelf.Id);
 
             if (dbShelf != null)
-            {
+            { 
                 dbShelf.PalletId = shelf.PalletId;
-                dbShelf.Location = shelf.Location;
+
+                if(updateLoc)
+                    dbShelf.Location = shelf.Location;
             }
 
             await context.SaveChangesAsync();

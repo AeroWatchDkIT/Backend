@@ -15,6 +15,7 @@ namespace PalletSyncApi.Controllers
         private readonly IPalletService _palletService = new PalletService();
         private readonly IShelfService _shelfService = new ShelfService();
         private readonly IUserService _userService = new UserService();
+        private readonly IPalletTrackingLogService _palletTrackingLogService = new PalletTrackingLogService();
 
         PalletSyncDbContext context = new PalletSyncDbContext();
 
@@ -34,23 +35,13 @@ namespace PalletSyncApi.Controllers
                 }
 
                 await _palletService.UpdatePalletAsync(data.Pallet);
-                await _shelfService.UpdateShelfFrontendAsync(data.Shelf);
+                await _shelfService.UpdateShelfFrontendAsync(data.Shelf, false);
+                await _palletTrackingLogService.AddPalletTrackingLogAsync(data);
 
                 forklift.LastPalletId = data.Pallet.Id;
                 forklift.LastUserId = data.UserId;
 
-                var trackingLog = new PalletTrackingLog();
-                //trackingLog.Id = context.PalletTrackingLog.OrderBy(f => f.Id).Last().Id + 1;
-                trackingLog.DateTime = data.TimeOfInteraction;
-                trackingLog.Action = data.Action;
-                trackingLog.PalletId = data.Pallet.Id;
-                trackingLog.PalletState = data.Pallet.State;
-                trackingLog.PalletLocation = data.Pallet.Location;
-                trackingLog.ForkliftId = data.ForkliftId;
-                trackingLog.UserId = data.UserId;   
-
-                context.PalletTrackingLog.Add(trackingLog);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 var palletCode = data.Pallet.Id.Substring(data.Pallet.Id.IndexOf("-") + 1);
                 var shelfCode = data.Shelf.Id.Substring(data.Shelf.Id.IndexOf("-") + 1);
@@ -69,7 +60,7 @@ namespace PalletSyncApi.Controllers
             }
             catch(Exception ex)
             {
-                return BadRequest("Something unexpected went wrong");
+                return BadRequest($"Something unexpected went wrong: {ex.Message}");
             }
         }
     }
