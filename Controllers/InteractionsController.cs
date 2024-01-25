@@ -11,10 +11,8 @@ namespace PalletSyncApi.Controllers
     [Route("Interactions")]
     public class InteractionsController: ControllerBase
     {
-        private readonly IForkliftService _forkliftService = new ForkliftService();
         private readonly IPalletService _palletService = new PalletService();
         private readonly IShelfService _shelfService = new ShelfService();
-        private readonly IUserService _userService = new UserService();
         private readonly IPalletTrackingLogService _palletTrackingLogService = new PalletTrackingLogService();
 
         PalletSyncDbContext context = new PalletSyncDbContext();
@@ -29,12 +27,17 @@ namespace PalletSyncApi.Controllers
 
                 var forklift = context.Forklifts.Where(f => f.Id == data.ForkliftId).FirstOrDefault();
 
-                if(!palletFound || !shelfFound || forklift == null)
+                if(!palletFound || !shelfFound)
                 {
-                    return NotFound($"The given pallet and/or shelf code does not appear in the database. Please rescan the codes");
+                    return NotFound($"The given pallet and/or shelf code does not appear in the database. Please rescan the codes or enter them manually");
                 }
 
-                await _palletService.UpdatePalletAsync(data.Pallet);
+                if (forklift == null)
+                {
+                    return NotFound($"Forklift id {data.ForkliftId} could not be found in the database");
+                }
+
+                await _palletService.UpdatePalletAsync(data.Pallet, false);
                 await _shelfService.UpdateShelfFrontendAsync(data.Shelf, false);
                 await _palletTrackingLogService.AddPalletTrackingLogAsync(data);
 

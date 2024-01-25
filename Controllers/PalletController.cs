@@ -59,7 +59,7 @@ namespace PalletSyncApi.Controllers
         {
             try
             {
-                await _palletService.UpdatePalletAsync(pallet);
+                await _palletService.UpdatePalletAsync(pallet, true);
                 return Ok($"Pallet {pallet.Id} has been successfully updated");
             }
             catch (Exception ex)

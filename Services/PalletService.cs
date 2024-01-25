@@ -24,14 +24,16 @@ namespace PalletSyncApi.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task UpdatePalletAsync(Pallet pallet) {
+        public async Task UpdatePalletAsync(Pallet pallet, bool updateLoc = true) {
             context = util.RemakeContext(context);
             var dbPallet = await context.Pallets.FirstOrDefaultAsync(e => e.Id == pallet.Id);
 
             if (dbPallet != null)
             {
                 dbPallet.State = pallet.State;
-                dbPallet.Location = pallet.Location;
+
+                if (updateLoc)
+                    dbPallet.Location = pallet.Location;
             }
 
             await context.SaveChangesAsync();
