@@ -53,7 +53,13 @@ namespace PalletSyncApi.Controllers
                 }
                 else
                 {
-                    return ValidationProblem($"Pallet code and shelf code do not match");
+                    var correctShelf = context.Shelves.Where(s => s.Id.Contains(palletCode)).FirstOrDefault();
+                    if(correctShelf != null)
+                        return ValidationProblem($"Pallet code and shelf codes {data.Pallet.Id} and {data.Shelf.Id} do not match. " +
+                            $"This pallet code belongs in shelf {correctShelf.Id} which is located in {correctShelf.Location}");
+                    else
+                        return ValidationProblem($"Pallet code and shelf codes {data.Pallet.Id} and {data.Shelf.Id} do not match. " +
+                            $"There is no matching shelf code for pallet code {data.Pallet.Id}. Please contact an administrator");
                 }
 
                 //TODO: Add state "misplaced" for pallets that are placed on the incorrect shelf
