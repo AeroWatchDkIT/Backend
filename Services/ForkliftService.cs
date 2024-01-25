@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
+using System.Security.Cryptography;
 
 
 namespace PalletSyncApi.Services
@@ -136,12 +137,36 @@ public class ForkliftService: IForkliftService
 
                     context.Dispose();
                     context = new PalletSyncDbContext();
-                    throw ex;
+                    throw;
                 }
             }
             return false;
         }
 
+        public async Task<bool> UpdateForkliftAfterScan(string forkliftId, string palletId, string userId)
+        {
+            context = util.RemakeContext(context);
+            var forkliftToUpdate = await context.Forklifts.FindAsync(forkliftId);
 
+            if (forkliftToUpdate != null)
+            {
+                try
+                {
+                    forkliftToUpdate.LastPalletId = palletId;
+                    forkliftToUpdate.LastUserId = userId;
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                catch (Exception ex) {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+
+                    context.Dispose();
+                    context = new PalletSyncDbContext();
+                    throw;
+                }
+            }
+
+            return false;
+        }
     }
 }

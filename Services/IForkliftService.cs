@@ -10,5 +10,6 @@ namespace PalletSyncApi.Services
         public Task<object> GetForkliftByIdAsync(string id);
         public Task<bool> DeleteObjectByIdAsync(string id);
         public Task<bool> UpdateForkliftByIdAsync(string newId, string oldId);
+        public Task<bool> UpdateForkliftAfterScan(string forkliftId, string palletId, string userId);
     }
 }
