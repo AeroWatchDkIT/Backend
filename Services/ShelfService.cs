@@ -18,12 +18,18 @@ namespace PalletSyncApi.Services
             return util.WrapListOfEntities(shelves);
         }
 
+        public async Task <object> GetShelfByIdAsync(string id)
+        {
+            return await context.Shelves.FirstOrDefaultAsync(s => s.Id == id);
+        }
+
         public async Task AddShelfAsync(Shelf shelf)
         {
             context = util.RemakeContext(context);
             context.Shelves.Add(shelf);
             await context.SaveChangesAsync();
         }
+
         public async Task UpdateShelfHardwareAsync(Shelf shelf)
         {
             // This currently is hardwired to work in the following way:
