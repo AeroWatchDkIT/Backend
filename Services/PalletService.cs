@@ -17,6 +17,10 @@ namespace PalletSyncApi.Services
             return WrapPalletList(pallets);
         }
 
+        public async Task<object> GetPalletById(string id) {
+            return await context.Pallets.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
         public async Task AddPalletAsync(Pallet pallet)
         {
             context = util.RemakeContext(context);

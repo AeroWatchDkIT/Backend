@@ -30,6 +30,26 @@ namespace PalletSyncApi.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPalletById(string id)
+        {
+            try
+            {
+                var result = await _palletService.GetPalletById(id);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
+        }
+
+
         [HttpPost(Name = "Pallets")]
         public async Task<IActionResult> AddPallet([FromBody] Pallet pallet)
         {
