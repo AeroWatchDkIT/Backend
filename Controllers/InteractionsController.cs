@@ -76,6 +76,13 @@ namespace PalletSyncApi.Controllers
         [HttpPost("OneCode")]
         public async Task<IActionResult> DealWithDeployedPallet([FromBody] CompareTwoCodesJson data)
         {
+            // 1) not too sure about the correctness of UpdateForkliftAfterScan setting the last user id, but that may be something to change later
+            // 2) change to compare2codes schema to make shelf nullable needs to be analysed, the above endpoint seems to deal with it ok however
+            // 3) making pallet's location field nullable would be nice but no idea what domino effect that could cause through rest of code
+
+            // 4) we really should refactor both of these endpoints to make use of transactions to maintain the consistency of the database
+            // transactions with efcore actually seem not too bad https://www.youtube.com/watch?v=25H84BXcr9M&ab_channel=MilanJovanovi%C4%87, but i think we would need to make PalletSyncDbContext
+            // a singleton and pass it around via Dependency Injection for transactions to work, as we are currently just make new instances of PalletSyncDbContext wherever it is needed
             try
             {
                 bool palletFound = context.Pallets.Where(p => p.Id == data.Pallet.Id).FirstOrDefault() != null;
@@ -94,19 +101,17 @@ namespace PalletSyncApi.Controllers
 
                 bool pickingPalletOffFloor = await ValidateStateChangeForPalletCodeOnly(data.Pallet);
 
-                await _palletService.UpdatePalletAsync(data.Pallet, true);
-
                 if (pickingPalletOffFloor)
-                {
-                    // Dont think this step is necessary when putting the pallet onto the floor                                                          
-                    await _forkliftService.UpdateForkliftAfterScan(data.ForkliftId, data.Pallet.Id, data.UserId);
-                }
+                    data.Pallet.Location = "";
+
+                await _palletService.UpdatePalletAsync(data.Pallet, true);                                 
+                await _forkliftService.UpdateForkliftAfterScan(data.ForkliftId, data.Pallet.Id, data.UserId);
                 await _palletTrackingLogService.AddPalletTrackingLogAsync(data);
 
                 if (pickingPalletOffFloor)
                     return Ok($"Pallet " + data.Pallet.Id + " picked up from location: " + data.Pallet.Location);
                 else
-                    return Ok($"Pallet " + data.Pallet.Id + " left at from location: " + data.Pallet.Location);
+                    return Ok($"Pallet " + data.Pallet.Id + " left at location: " + data.Pallet.Location);
             }
             catch (Exception ex)
             {
