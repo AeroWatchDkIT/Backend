@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PalletSyncApi.Classes;
 using PalletSyncApi.Services;
 
 namespace PalletSyncApi.Controllers
@@ -15,6 +16,24 @@ namespace PalletSyncApi.Controllers
             try
             {
                 return Ok(await _palletTrackingLogService.GetAllTrackingLogsAsync());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchTrackingLogs([FromQuery] UniversalSearchTerm query)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                return Ok(await _palletTrackingLogService.SearchTrackingLogsAsync(query));
             }
             catch (Exception ex)
             {

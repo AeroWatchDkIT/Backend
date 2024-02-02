@@ -31,6 +31,20 @@ namespace PalletSyncApi.Services
             return util.WrapListOfEntities(trackingLogs);
         }
 
-
+        public async Task<object> SearchTrackingLogsAsync(UniversalSearchTerm query)
+        {
+            var trackingLogs = await context.PalletTrackingLog
+                .Where(u => u.Id.ToString().Contains(query.SearchTerm) ||
+                u.DateTime.ToString().Contains(query.SearchTerm) ||
+                u.Action.ToString().Contains(query.SearchTerm) ||
+                u.PalletId.ToString().Contains(query.SearchTerm) ||
+                //u.PalletState.ToString().Contains(query.SearchTerm) // converting enum to string directly in linq query doesn't work
+                u.PalletLocation.ToString().Contains(query.SearchTerm) ||
+                u.ForkliftId.ToString().Contains(query.SearchTerm) ||
+                u.UserId.ToString().Contains(query.SearchTerm)
+                )
+                .ToListAsync();
+            return util.WrapListOfEntities(trackingLogs);
+        }
     }
 }
