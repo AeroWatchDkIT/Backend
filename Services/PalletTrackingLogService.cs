@@ -1,4 +1,5 @@
-﻿using PalletSyncApi.Classes;
+﻿using Microsoft.EntityFrameworkCore;
+using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
 
 namespace PalletSyncApi.Services
@@ -6,6 +7,7 @@ namespace PalletSyncApi.Services
     public class PalletTrackingLogService : IPalletTrackingLogService
     {
         PalletSyncDbContext context = new PalletSyncDbContext();
+        GeneralUtilities util = new GeneralUtilities();
 
         public async Task AddPalletTrackingLogAsync(CompareTwoCodesJson data)
         {
@@ -21,5 +23,14 @@ namespace PalletSyncApi.Services
             context.PalletTrackingLog.Add(trackingLog);
             await context.SaveChangesAsync();
         }
+
+        public async Task<object> GetAllTrackingLogsAsync()
+        {
+            context = util.RemakeContext(context);
+            var trackingLogs = await context.PalletTrackingLog.ToListAsync();
+            return util.WrapListOfEntities(trackingLogs);
+        }
+
+
     }
 }
