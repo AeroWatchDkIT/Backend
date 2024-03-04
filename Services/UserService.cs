@@ -117,13 +117,17 @@ namespace PalletSyncApi.Services
             {
                 if (requestFromAdmin && user.UserType != UserType.Admin)
                 {
-                    throw new UnauthorizedAccessException();
+                    throw new UnauthorizedAccessException("Access denied: User does not have administrator privileges");
+                }
+                else if (!user.ForkliftCertified)
+                {
+                    throw new UnauthorizedAccessException("Access denied: User is not forklift certified");
                 }
 
                 return true;
             }
 
-            throw new InvalidCredentialException();
+            throw new InvalidCredentialException("Invalid user id and password combination");
         }
         public async Task<object> SearchUsersAsync(UniversalSearchTerm query)
         {

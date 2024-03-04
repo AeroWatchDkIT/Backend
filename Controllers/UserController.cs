@@ -155,11 +155,11 @@ namespace PalletSyncApi.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return BadRequest("Access denied: User does not have administrator privileges");
+                return BadRequest(ex.Message);
             }
             catch (InvalidCredentialException ex)
             {
-                return BadRequest("Invalid user id and password combination");
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
