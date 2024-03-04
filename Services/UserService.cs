@@ -34,6 +34,8 @@ namespace PalletSyncApi.Services
         {
             try
             {
+                string salt;
+                user.Passcode = Sha256Hash.HashPasswordWithSalt(user.Passcode, out salt) + ";" + salt;
                 context.Users.Add(user);
                 await context.SaveChangesAsync();
             }
@@ -130,7 +132,8 @@ namespace PalletSyncApi.Services
 
             if (user != null)
             {
-                user.Passcode = newPassword;
+                string salt;
+                user.Passcode = Sha256Hash.HashPasswordWithSalt(newPassword, out salt) + ";" + salt;
                 await context.SaveChangesAsync();
 
                 return true;
@@ -142,8 +145,10 @@ namespace PalletSyncApi.Services
         public async Task<bool> AuthenticateUserAsync(string userId, string passCode, bool requestFromAdmin)
         {
             var user = await context.Users.FindAsync(userId);
+            var salt = user != null ? user.Passcode.Substring(user.Passcode.IndexOf(";") + 1) : String.Empty;
+            var pass = user != null ? user.Passcode.Substring(0, user.Passcode.IndexOf(";")) : String.Empty; 
 
-            if (user != null && passCode == user.Passcode)
+            if (user != null && Sha256Hash.VerifyPassword(passCode, salt, pass))
             {
                 if (requestFromAdmin && user.UserType != UserType.Admin)
                 {
