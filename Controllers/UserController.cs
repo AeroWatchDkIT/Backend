@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Services;
+using System.Security.Authentication;
 namespace PalletSyncApi.Controllers
 {
     [ApiController]
@@ -131,6 +133,33 @@ namespace PalletSyncApi.Controllers
                 };
 
                 return BadRequest(errorResponse);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        [HttpPost("Authenticate")]
+        public async Task<IActionResult> AuthenticateUser(string userId, string passCode, bool requestFromAdmin = false)
+        {
+            if (!ModelState.IsValid || string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(passCode))
+            {
+                return BadRequest("Invalid object!");
+            }
+
+            try
+            {
+                var valid = await _userService.AuthenticateUserAsync(userId, passCode, requestFromAdmin);
+                return Ok();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return BadRequest("Access denied: User does not have administrator privileges");
+            }
+            catch (InvalidCredentialException ex)
+            {
+                return BadRequest("Invalid user id and password combination");
             }
             catch (Exception ex)
             {

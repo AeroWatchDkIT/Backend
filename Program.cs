@@ -65,21 +65,21 @@ IEnumerable<Pallet> GetAllPallets()
 }
 
 
-void AddShelf()
-{
-    var shelf = new Shelf { Id = "S-1234", Location = "Room A3" };
-    shelf.Pallet = new Pallet { Id = "P-1234", Location = "Room A3", State = PalletState.Shelf };
+//void AddShelf()
+//{
+//    var shelf = new Shelf { Id = "S-1234", Location = "Room A3" };
+//    shelf.Pallet = new Pallet { Id = "P-1234", Location = "Room A3", State = PalletState.Shelf };
 
-    using var context = new PalletSyncDbContext();
+//    using var context = new PalletSyncDbContext();
 
-    if (!context.Shelves.Where(a => a.Id == shelf.Id).Any())
-    {
-        context.Shelves.Add(shelf);
-        context.SaveChanges();
-    }
-}
+//    if (!context.Shelves.Where(a => a.Id == shelf.Id).Any())
+//    {
+//        context.Shelves.Add(shelf);
+//        context.SaveChanges();
+//    }
+//}
 
-AddShelf();
+//AddShelf();
 PrintAllUsers();
 Console.WriteLine();
 PrintAllForklifts();

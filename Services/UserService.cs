@@ -3,6 +3,7 @@ using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
 using PalletSyncApi.Enums;
 using System.Net.WebSockets;
+using System.Security.Authentication;
 
 namespace PalletSyncApi.Services
 {
@@ -108,6 +109,22 @@ namespace PalletSyncApi.Services
             return false;
         }
 
+        public async Task<bool> AuthenticateUserAsync(string userId, string passCode, bool requestFromAdmin)
+        {
+            var user = await context.Users.FindAsync(userId);
+
+            if (user != null && passCode == user.Passcode)
+            {
+                if (requestFromAdmin && user.UserType != UserType.Admin)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+
+                return true;
+            }
+
+            throw new InvalidCredentialException();
+        }
         public async Task<object> SearchUsersAsync(UniversalSearchTerm query)
         {
             
