@@ -80,17 +80,27 @@ namespace PalletSyncApi.Services
 
         public async Task<bool> UpdateUserAsync(User user)
         {
+            //TODO: Change this so that we're passing in only UserType, ForkliftCertified, IncorrectPalletPlacements and any other attributes
+            //that we think should have the ability to be updated by the admin
+
             var userToUpdate = await context.Users.FindAsync(user.Id);
 
             if (userToUpdate != null)
             {
                 try
                 {
-                    userToUpdate.Id = user.Id;
+                    //TODO: Planning to implement an autoincrementer for the user id so updating it manually here doesn't make sense
+                    //userToUpdate.Id = user.Id;
+
                     userToUpdate.UserType = user.UserType;
-                    userToUpdate.FirstName = user.FirstName;
-                    userToUpdate.LastName = user.LastName;
-                    userToUpdate.Passcode = user.Passcode;
+
+                    //Admin should not be able to change the name and suename of any employee
+                    //userToUpdate.FirstName = user.FirstName;
+                    //userToUpdate.LastName = user.LastName; 
+
+                    //Have a separate endpoint for this
+                    //userToUpdate.Passcode = user.Passcode; 
+
                     userToUpdate.ForkliftCertified = user.ForkliftCertified;
                     userToUpdate.IncorrectPalletPlacements = user.IncorrectPalletPlacements;
 
@@ -106,6 +116,26 @@ namespace PalletSyncApi.Services
                     throw;
                 }
             }
+            return false;
+        }
+
+        public async Task<bool> UpdateUserPasswordAsync(string userId, string newPassword)
+        {
+            //TODO: It's easy for admin user to reset their password since they'll be using a PC most likely but what about the forklift user?
+            //I'm thinking maybe we should send out an email to a person's work email so that they can reset their password. Also
+            //Should have "forgot password" option, in which case an email would be necessary. Need to have discussion with Kyle and Nikita
+            //about this
+
+            var user = await context.Users.FindAsync(userId);
+
+            if (user != null)
+            {
+                user.Passcode = newPassword;
+                await context.SaveChangesAsync();
+
+                return true;
+            }
+
             return false;
         }
 

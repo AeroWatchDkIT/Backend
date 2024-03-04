@@ -140,6 +140,26 @@ namespace PalletSyncApi.Controllers
             }
         }
 
+        [HttpPut("PasswordReset")]
+        public async Task<IActionResult> UpdateUserPassword(string id, string newPassword)
+        {
+            try
+            {
+                bool passwordUpdated = await _userService.UpdateUserPasswordAsync(id, newPassword);
+                if (passwordUpdated)
+                {
+                    return Ok();
+                }
+                return NotFound("User id not found");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(500);
+            }
+        }
+
+
         [HttpPost("Authenticate")]
         public async Task<IActionResult> AuthenticateUser(string userId, string passCode, bool requestFromAdmin = false)
         {
