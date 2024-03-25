@@ -53,7 +53,7 @@ namespace PalletSyncApi.Controllers
         [HttpPost(Name = "Pallets")]
         public async Task<IActionResult> AddPallet([FromBody] Pallet pallet)
         {
-            if (!ModelState.IsValid || string.IsNullOrEmpty(pallet.Id))
+            if (!ModelState.IsValid || pallet == null || string.IsNullOrEmpty(pallet.Id))
             {
                 return BadRequest("Invalid object!");
             }
