@@ -7,9 +7,14 @@ namespace PalletSyncApi.Services
 {
     public class PalletService : IPalletService
     {
-        PalletSyncDbContext context = new PalletSyncDbContext();
+        PalletSyncDbContext context;
+        GeneralUtilities util;
 
-        GeneralUtilities util = new GeneralUtilities();
+        public PalletService(PalletSyncDbContext newContext = null, GeneralUtilities newUtil = null) {
+            context = newContext ?? new PalletSyncDbContext();
+            util = newUtil ?? new GeneralUtilities();
+        }
+
         public async Task<object> GetAllPalletsAsync()
         {
             context = util.RemakeContext(context);
@@ -26,7 +31,7 @@ namespace PalletSyncApi.Services
             context = util.RemakeContext(context);
             context.Pallets.Add(pallet);
             await context.SaveChangesAsync();
-        }
+            }
 
         public async Task UpdatePalletAsync(Pallet pallet, bool updateLoc = true) {
             context = util.RemakeContext(context);

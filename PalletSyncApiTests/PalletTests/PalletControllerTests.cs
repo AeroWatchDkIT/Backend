@@ -4,10 +4,6 @@ using PalletSyncApi.Classes;
 using PalletSyncApi.Controllers;
 using PalletSyncApi.Enums;
 using PalletSyncApi.Services;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace PalletSyncApiTests.PalletTests
 {
@@ -37,7 +33,7 @@ namespace PalletSyncApiTests.PalletTests
             return mockPalletService;
         }
 
-        // GetPalletsTests
+        // GetPallets Tests
 
         [Fact]
         public async Task GetPallets_ReturnsStatusCode500_OnException()

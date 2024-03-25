@@ -6,7 +6,7 @@ namespace PalletSyncApi.Classes
     {
         public GeneralUtilities() { }
 
-        public PalletSyncDbContext RemakeContext(PalletSyncDbContext context)
+        public virtual PalletSyncDbContext RemakeContext(PalletSyncDbContext context)
         {
             context.Dispose();
             context = new PalletSyncDbContext();

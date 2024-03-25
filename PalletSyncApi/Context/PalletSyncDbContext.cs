@@ -6,11 +6,11 @@ namespace PalletSyncApi.Context
 {
     public class PalletSyncDbContext : DbContext
     {
-        public DbSet<Shelf> Shelves { get; set; }
-        public DbSet<Pallet> Pallets { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Forklift> Forklifts { get; set; }
-        public DbSet<PalletTrackingLog> PalletTrackingLog { get; set; }
+        public virtual DbSet<Shelf> Shelves { get; set; }
+        public virtual DbSet<Pallet> Pallets { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Forklift> Forklifts { get; set; }
+        public virtual DbSet<PalletTrackingLog> PalletTrackingLog { get; set; }
 
         public PalletSyncDbContext()
         {
