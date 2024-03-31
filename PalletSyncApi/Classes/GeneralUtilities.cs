@@ -13,7 +13,7 @@ namespace PalletSyncApi.Classes
             return context;
         }
 
-        public object WrapListOfEntities(object entities)
+        public virtual object WrapListOfEntities(object entities)
         {
             var WrappedEntities = new
             {

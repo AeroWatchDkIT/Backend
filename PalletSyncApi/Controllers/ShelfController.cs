@@ -53,7 +53,7 @@ namespace PalletSyncApi.Controllers
         [HttpPost(Name = "Shelves")]
         public async Task<IActionResult> AddShelf([FromBody] Shelf shelf)
         {
-            if (!ModelState.IsValid || string.IsNullOrEmpty(shelf.Id))
+            if (!ModelState.IsValid || shelf == null || string.IsNullOrEmpty(shelf.Id))
             {
                 return BadRequest("Invalid object!");
             }

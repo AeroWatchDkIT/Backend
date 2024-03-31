@@ -91,7 +91,7 @@ namespace PalletSyncApiTests.PalletTests
         // GetPalletById Tests
 
         [Fact]
-        public async Task GetPalletsById_ReturnsStatusCode500_OnException()
+        public async Task GetPalletById_ReturnsStatusCode500_OnException()
         {
             // Arrange
             var mockPalletService = CreateMockPalletService(exception: new Exception());
@@ -152,7 +152,7 @@ namespace PalletSyncApiTests.PalletTests
         }
 
         [Fact]
-        public async Task GetPallets_CallsGetPalletByIdOnce()
+        public async Task GetPalletsById_CallsGetPalletByIdOnce()
         {
             // Arrange
             var mockPalletService = CreateMockPalletService();

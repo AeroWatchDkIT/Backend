@@ -8,8 +8,14 @@ namespace PalletSyncApi.Services
 {
     public class ShelfService : IShelfService
     {
-        PalletSyncDbContext context = new PalletSyncDbContext();
-        GeneralUtilities util = new GeneralUtilities();
+        PalletSyncDbContext context;
+        GeneralUtilities util;
+
+        public ShelfService(PalletSyncDbContext newContext = null, GeneralUtilities newUtil = null)
+        {
+            context = newContext ?? new PalletSyncDbContext();
+            util = newUtil ?? new GeneralUtilities();
+        }
 
         public async Task<object> GetAllShelvesAsync()
         {
