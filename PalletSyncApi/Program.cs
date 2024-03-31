@@ -125,4 +125,6 @@ app.UseCors(options =>
         .AllowAnyMethod();
 });
 
+app.UseStaticFiles();
+
 app.Run();

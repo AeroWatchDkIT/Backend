@@ -6,6 +6,8 @@ namespace PalletSyncApi.Services
     public interface IUserService
     {
         public Task<object> GetAllUsersAsync();
+        public Task<string> GetImagePath(string imagePath);
+        public Task<byte[]> GetImage(string userId);
         public Task AddUserAsync(User user);
         public Task<object> GetUserByIdAsync(string id);
         public Task<bool> DeleteUserByIdAsync(string id);

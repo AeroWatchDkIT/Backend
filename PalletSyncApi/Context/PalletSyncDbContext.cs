@@ -55,12 +55,12 @@ namespace PalletSyncApi.Context
             var randomPassword = Sha256Hash.HashPasswordWithSalt("245tbgt", out salt) + ";" + salt;
 
             modelBuilder.Entity<User>().HasData(
-                new User { Id = "U-0001", UserType = UserType.Admin, FirstName = "Kacper", LastName = "Wroblewski", Passcode = randomPassword, ForkliftCertified = true, IncorrectPalletPlacements = 0, CorrectPalletPlacements = 999 },
-                new User { Id = "U-0002", UserType = UserType.Regular, FirstName = "Nikita", LastName = "Fedans", Passcode = randomPassword, ForkliftCertified = true, IncorrectPalletPlacements = 13, CorrectPalletPlacements = 0 },
-                new User { Id = "U-0003", UserType = UserType.Regular, FirstName = "Teodor", LastName = "Donchev", Passcode = randomPassword, ForkliftCertified = true, IncorrectPalletPlacements = 3, CorrectPalletPlacements = 3 },
-                new User { Id = "U-0004", UserType = UserType.Regular, FirstName = "Vincent", LastName = "Arellano", Passcode = randomPassword, ForkliftCertified = false, IncorrectPalletPlacements = 0, CorrectPalletPlacements = 0 },
-                new User { Id = "U-0005", UserType = UserType.Regular, FirstName = "Kyle", LastName = "McQuillan", Passcode = randomPassword, ForkliftCertified = false, IncorrectPalletPlacements = 0, CorrectPalletPlacements = 0 },
-                new User { Id = "U-0006", UserType = UserType.Admin, FirstName = "Siya", LastName = "Salekar", Passcode = randomPassword, ForkliftCertified = false, IncorrectPalletPlacements = 0, CorrectPalletPlacements = 0 }
+                new User { Id = "U-0001", UserType = UserType.Admin, FirstName = "Kacper", LastName = "Wroblewski", Passcode = randomPassword, ForkliftCertified = true, IncorrectPalletPlacements = 0, CorrectPalletPlacements = 999, ImageFilePath = String.Empty },
+                new User { Id = "U-0002", UserType = UserType.Regular, FirstName = "Nikita", LastName = "Fedans", Passcode = randomPassword, ForkliftCertified = true, IncorrectPalletPlacements = 13, CorrectPalletPlacements = 0, ImageFilePath = String.Empty },
+                new User { Id = "U-0003", UserType = UserType.Regular, FirstName = "Teodor", LastName = "Donchev", Passcode = randomPassword, ForkliftCertified = true, IncorrectPalletPlacements = 3, CorrectPalletPlacements = 3, ImageFilePath = String.Empty },
+                new User { Id = "U-0004", UserType = UserType.Regular, FirstName = "Vincent", LastName = "Arellano", Passcode = randomPassword, ForkliftCertified = false, IncorrectPalletPlacements = 0, CorrectPalletPlacements = 0, ImageFilePath = String.Empty },
+                new User { Id = "U-0005", UserType = UserType.Regular, FirstName = "Kyle", LastName = "McQuillan", Passcode = randomPassword, ForkliftCertified = false, IncorrectPalletPlacements = 0, CorrectPalletPlacements = 0, ImageFilePath = String.Empty },
+                new User { Id = "U-0006", UserType = UserType.Admin, FirstName = "Siya", LastName = "Salekar", Passcode = randomPassword, ForkliftCertified = false, IncorrectPalletPlacements = 0, CorrectPalletPlacements = 0, ImageFilePath = String.Empty }
                 );
 
             modelBuilder.Entity<Forklift>()

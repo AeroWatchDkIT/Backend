@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Services;
@@ -11,13 +12,47 @@ namespace PalletSyncApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        GeneralUtilities utils = new GeneralUtilities();
 
         public UserController(IUserService userService)
         {
             _userService = userService;
         }
 
-        [HttpGet]
+        private async Task<IActionResult> UploadImage(IFormFile file, string imagePath)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("File is not selected or is empty.");
+            }
+
+            using (var stream = new FileStream(imagePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return Ok($"File uploaded successfully");
+        }
+
+        [HttpGet("GetImage")]
+        public async Task<IActionResult> GetImage(string userId)
+        {
+            var imagePath = await _userService.GetImagePath(userId);
+            var imageData = await _userService.GetImage(imagePath);
+
+            if (imageData == null)
+            {
+                return NotFound();
+            }
+
+            // Determine the content type based on the file extension
+            var contentType = utils.GetContentType(imagePath);
+
+            // Return the image file as a file stream
+            return File(imageData, contentType);
+        }
+
+    [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
             try
@@ -32,7 +67,7 @@ namespace PalletSyncApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] User user)
+        public async Task<IActionResult> AddUser([FromForm] User user, IFormFile image)
         {
             if (!ModelState.IsValid || string.IsNullOrEmpty(user.Id))
             {
@@ -41,6 +76,9 @@ namespace PalletSyncApi.Controllers
 
             try
             {
+                var imageName = user.FirstName + user.LastName + ".jpg";
+                user.ImageFilePath = Path.Combine("wwwroot/ProfileImages", imageName);
+                await UploadImage(image, user.ImageFilePath);
                 await _userService.AddUserAsync(user);
                 return StatusCode(201);
             }

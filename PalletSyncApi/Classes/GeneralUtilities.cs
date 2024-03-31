@@ -1,4 +1,5 @@
-﻿using PalletSyncApi.Context;
+﻿using Microsoft.AspNetCore.StaticFiles;
+using PalletSyncApi.Context;
 
 namespace PalletSyncApi.Classes
 {
@@ -20,6 +21,17 @@ namespace PalletSyncApi.Classes
                 entities
             };
             return WrappedEntities;
+        }
+
+        public string GetContentType(string filePath)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+            if (!provider.TryGetContentType(filePath, out contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+            return contentType;
         }
     }
 }

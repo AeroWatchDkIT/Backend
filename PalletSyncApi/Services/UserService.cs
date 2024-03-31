@@ -1,7 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using PalletSyncApi.Classes;
 using PalletSyncApi.Context;
 using PalletSyncApi.Enums;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Net.WebSockets;
 using System.Security.Authentication;
 
@@ -38,6 +42,29 @@ namespace PalletSyncApi.Services
             return Wrap(users);
 
             // the reason for wrapping is https://youtu.be/60F8rzP5nQo?si=istwlDOjK0S2XtJO&t=295
+        }
+
+        public async Task<string> GetImagePath(string userId)
+        {
+            return context.Users.Where(u => u.Id == userId).Select(u => u.ImageFilePath).FirstOrDefault(); 
+        }
+
+        public async Task<byte[]> GetImage(string imagePath)
+        {
+            if (!File.Exists(imagePath))
+            {
+                return null;
+            }
+
+            // Read the image file into a byte array asynchronously
+            byte[] imageBytes;
+            using (var stream = new FileStream(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
+            {
+                imageBytes = new byte[stream.Length];
+                await stream.ReadAsync(imageBytes, 0, (int)stream.Length);
+            }
+
+            return imageBytes;
         }
 
         public async Task AddUserAsync(User user)
