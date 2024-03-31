@@ -20,11 +20,21 @@ namespace PalletSyncApi.Services
             public string Passcode { get; set; }
             public string ForkliftCertified { get; set; }
             public string IncorrectPalletPlacements { get; set; }
+            public string CorrectPalletPlacements { get; set; }
         }
 
         public async Task<object> GetAllUsersAsync()
         {
-            var users = await context.Users.Select(u => new {u.Id, u.UserType, u.FirstName, u.LastName, u.ForkliftCertified, u.IncorrectPalletPlacements}).ToListAsync();
+            var users = await context.Users.Select(u => new {
+                u.Id, 
+                u.UserType, 
+                u.FirstName,
+                u.LastName, 
+                u.ForkliftCertified,
+                u.IncorrectPalletPlacements, 
+                u.CorrectPalletPlacements
+            }).ToListAsync();
+
             return Wrap(users);
 
             // the reason for wrapping is https://youtu.be/60F8rzP5nQo?si=istwlDOjK0S2XtJO&t=295
@@ -52,7 +62,7 @@ namespace PalletSyncApi.Services
         {
             var user = await context.Users
                 .Where(u => u.Id == id)
-                .Select(u => new { u.Id, u.UserType, u.FirstName, u.LastName, u.ForkliftCertified, u.IncorrectPalletPlacements })
+                .Select(u => new { u.Id, u.UserType, u.FirstName, u.LastName, u.ForkliftCertified, u.IncorrectPalletPlacements, u.CorrectPalletPlacements })
                 .FirstOrDefaultAsync();
 
             return user;
@@ -105,6 +115,7 @@ namespace PalletSyncApi.Services
 
                     userToUpdate.ForkliftCertified = user.ForkliftCertified;
                     userToUpdate.IncorrectPalletPlacements = user.IncorrectPalletPlacements;
+                    userToUpdate.CorrectPalletPlacements = user.CorrectPalletPlacements;
 
                     await context.SaveChangesAsync();
                     return true;
@@ -179,7 +190,8 @@ namespace PalletSyncApi.Services
                     LastName = user.LastName.ToString().ToLower(),
                     Passcode = user.Passcode.ToString().ToLower(),
                     ForkliftCertified = user.ForkliftCertified.ToString().ToLower(),
-                    IncorrectPalletPlacements = user.IncorrectPalletPlacements.ToString().ToLower()
+                    IncorrectPalletPlacements = user.IncorrectPalletPlacements.ToString().ToLower(),
+                    CorrectPalletPlacements = user.CorrectPalletPlacements.ToString().ToLower()
                 };
 
                 allUsersAsString.Add(stringUser);
@@ -198,9 +210,10 @@ namespace PalletSyncApi.Services
                         u.FirstName,
                         u.LastName,
                         u.ForkliftCertified,
-                        u.IncorrectPalletPlacements
+                        u.IncorrectPalletPlacements,
+                        u.CorrectPalletPlacements
                     }.Any(u => u.Contains(query.SearchTerm.ToLower())))
-                .Select(u => new { u.Id, u.UserType, u.FirstName, u.LastName, ForkliftCertified = Convert.ToBoolean(u.ForkliftCertified), IncorrectPalletPlacements = Convert.ToInt32(u.IncorrectPalletPlacements) }).ToList();
+                .Select(u => new { u.Id, u.UserType, u.FirstName, u.LastName, ForkliftCertified = Convert.ToBoolean(u.ForkliftCertified), IncorrectPalletPlacements = Convert.ToInt32(u.IncorrectPalletPlacements), CorrectPalletPlacements = Convert.ToInt32(u.CorrectPalletPlacements) }).ToList();
 
             return Wrap(users);
         }

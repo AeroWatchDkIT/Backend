@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PalletSyncApi.Context;
 
@@ -11,9 +12,11 @@ using PalletSyncApi.Context;
 namespace PalletSyncApi.Migrations
 {
     [DbContext(typeof(PalletSyncDbContext))]
-    partial class PalletSyncDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240331163814_Sample users with hashed passwords")]
+    partial class Sampleuserswithhashedpasswords
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,7 +171,7 @@ namespace PalletSyncApi.Migrations
                         {
                             Id = 1,
                             Action = "Forklift F-0012 placed pallet P-0001 on shelf S-0001 in Warehouse A by user U-0001",
-                            DateTime = new DateTime(2024, 3, 31, 16, 48, 8, 159, DateTimeKind.Utc).AddTicks(945),
+                            DateTime = new DateTime(2024, 3, 31, 16, 38, 13, 838, DateTimeKind.Utc).AddTicks(5236),
                             ForkliftId = "F-0012",
                             PalletId = "P-0001",
                             PalletLocation = "Warehouse A",
@@ -179,7 +182,7 @@ namespace PalletSyncApi.Migrations
                         {
                             Id = 2,
                             Action = "Forklift F-0007 placed pallet P-0002 on the floor in Warehouse B by user U-0002",
-                            DateTime = new DateTime(2024, 3, 31, 16, 48, 8, 159, DateTimeKind.Utc).AddTicks(950),
+                            DateTime = new DateTime(2024, 3, 31, 16, 38, 13, 838, DateTimeKind.Utc).AddTicks(5239),
                             ForkliftId = "F-0007",
                             PalletId = "P-0002",
                             PalletLocation = "Warehouse B",
@@ -244,9 +247,6 @@ namespace PalletSyncApi.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("CorrectPalletPlacements")
-                        .HasColumnType("int");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -276,67 +276,61 @@ namespace PalletSyncApi.Migrations
                         new
                         {
                             Id = "U-0001",
-                            CorrectPalletPlacements = 999,
                             FirstName = "Kacper",
                             ForkliftCertified = true,
                             IncorrectPalletPlacements = 0,
                             LastName = "Wroblewski",
-                            Passcode = "bvbGeuXHNenHZxdmJlfpFXe/ETs=;aPQbe8aFaDHNyL1AYNZZbw==",
+                            Passcode = "Y0zSxFzAN8TnzhIFaKOpm+O2Zn4=;fvmCitU3kakymjgXVKxeiQ==",
                             UserType = 1
                         },
                         new
                         {
                             Id = "U-0002",
-                            CorrectPalletPlacements = 0,
                             FirstName = "Nikita",
                             ForkliftCertified = true,
                             IncorrectPalletPlacements = 13,
                             LastName = "Fedans",
-                            Passcode = "bvbGeuXHNenHZxdmJlfpFXe/ETs=;aPQbe8aFaDHNyL1AYNZZbw==",
+                            Passcode = "Y0zSxFzAN8TnzhIFaKOpm+O2Zn4=;fvmCitU3kakymjgXVKxeiQ==",
                             UserType = 0
                         },
                         new
                         {
                             Id = "U-0003",
-                            CorrectPalletPlacements = 3,
                             FirstName = "Teodor",
                             ForkliftCertified = true,
                             IncorrectPalletPlacements = 3,
                             LastName = "Donchev",
-                            Passcode = "bvbGeuXHNenHZxdmJlfpFXe/ETs=;aPQbe8aFaDHNyL1AYNZZbw==",
+                            Passcode = "Y0zSxFzAN8TnzhIFaKOpm+O2Zn4=;fvmCitU3kakymjgXVKxeiQ==",
                             UserType = 0
                         },
                         new
                         {
                             Id = "U-0004",
-                            CorrectPalletPlacements = 0,
                             FirstName = "Vincent",
                             ForkliftCertified = false,
                             IncorrectPalletPlacements = 0,
                             LastName = "Arellano",
-                            Passcode = "bvbGeuXHNenHZxdmJlfpFXe/ETs=;aPQbe8aFaDHNyL1AYNZZbw==",
+                            Passcode = "Y0zSxFzAN8TnzhIFaKOpm+O2Zn4=;fvmCitU3kakymjgXVKxeiQ==",
                             UserType = 0
                         },
                         new
                         {
                             Id = "U-0005",
-                            CorrectPalletPlacements = 0,
                             FirstName = "Kyle",
                             ForkliftCertified = false,
                             IncorrectPalletPlacements = 0,
                             LastName = "McQuillan",
-                            Passcode = "bvbGeuXHNenHZxdmJlfpFXe/ETs=;aPQbe8aFaDHNyL1AYNZZbw==",
+                            Passcode = "Y0zSxFzAN8TnzhIFaKOpm+O2Zn4=;fvmCitU3kakymjgXVKxeiQ==",
                             UserType = 0
                         },
                         new
                         {
                             Id = "U-0006",
-                            CorrectPalletPlacements = 0,
                             FirstName = "Siya",
                             ForkliftCertified = false,
                             IncorrectPalletPlacements = 0,
                             LastName = "Salekar",
-                            Passcode = "bvbGeuXHNenHZxdmJlfpFXe/ETs=;aPQbe8aFaDHNyL1AYNZZbw==",
+                            Passcode = "Y0zSxFzAN8TnzhIFaKOpm+O2Zn4=;fvmCitU3kakymjgXVKxeiQ==",
                             UserType = 1
                         });
                 });
