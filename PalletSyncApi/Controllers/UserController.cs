@@ -52,7 +52,7 @@ namespace PalletSyncApi.Controllers
             return File(imageData, contentType);
         }
 
-    [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
             try
@@ -76,8 +76,15 @@ namespace PalletSyncApi.Controllers
 
             try
             {
-                var imageName = user.FirstName + user.LastName + ".jpg";
-                user.ImageFilePath = Path.Combine("wwwroot/ProfileImages", imageName);
+                var folderName = "wwwroot/ProfileImages";
+
+                if (!Directory.Exists(folderName))
+                {
+                    Directory.CreateDirectory(folderName);
+                }
+
+                var imageName = user.Id + ".jpg";
+                user.ImageFilePath = Path.Combine(folderName, imageName);
                 await UploadImage(image, user.ImageFilePath);
                 await _userService.AddUserAsync(user);
                 return StatusCode(201);
