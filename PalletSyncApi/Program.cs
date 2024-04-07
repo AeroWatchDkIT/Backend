@@ -7,89 +7,12 @@ using PalletSyncApi.Services;
 
 //****DATABASE SETUP****
 
-using (PalletSyncDbContext context = new PalletSyncDbContext())
-{
-    context.Database.EnsureCreated();
-}
-
-void PrintAllUsers() { 
-    using var context = new PalletSyncDbContext();
-    try
-    {
-        var users = context.Users.ToList();
-
-        Console.WriteLine("USERS");
-        foreach (var user in users)
-        {
-            Console.WriteLine("-----------------------");
-            Console.WriteLine("Id: " + user.Id);
-            Console.WriteLine("UserType: " + user.UserType.ToString());
-            Console.WriteLine("FistName: " + user.FirstName);
-            Console.WriteLine("LastName: " + user.LastName);
-            Console.WriteLine("ForkliftCertified: " + user.ForkliftCertified);
-            Console.WriteLine("IncorrectPalletPlacements: " + user.IncorrectPalletPlacements);
-            Console.WriteLine("-----------------------");
-        }
-    }
-    catch (Exception ex) { Console.WriteLine(ex); }
-}
-
-void PrintAllForklifts()
-{
-    using var context = new PalletSyncDbContext();
-    var forklifts = context.Forklifts.Include(f => f.LastUser).Include(f => f.LastPallet).ToList();
-
-    Console.WriteLine("FORKLIFTS");
-    foreach(var forklift in forklifts)
-    {
-        Console.WriteLine("-----------------------");
-        Console.WriteLine("Id: " + forklift.Id);
-        Console.WriteLine("LastUserId: " + (string.IsNullOrEmpty(forklift.LastUserId) ? "Null" : forklift.LastUserId));
-        Console.WriteLine("UserFirstName: " + (forklift?.LastUser?.FirstName ?? "Null"));
-        Console.WriteLine("LastPalletId: " + (string.IsNullOrEmpty(forklift.LastPalletId) ? "Null" : forklift.LastPalletId));
-        Console.WriteLine("LastPalletState: " + (forklift?.LastPallet?.State.ToString() ?? "Null"));
-        Console.WriteLine("-----------------------");
-    }
-}
-
-IEnumerable<Shelf> GetAllShelves()
-{
-    using var context = new PalletSyncDbContext();
-    return context.Shelves.ToList();
-}
-
-IEnumerable<Pallet> GetAllPallets()
-{
-    using var context = new PalletSyncDbContext();
-    return context.Pallets.ToList();
-}
-
-
-//void AddShelf()
+//using (PalletSyncDbContext context = new PalletSyncDbContext())
 //{
-//    var shelf = new Shelf { Id = "S-1234", Location = "Room A3" };
-//    shelf.Pallet = new Pallet { Id = "P-1234", Location = "Room A3", State = PalletState.Shelf };
-
-//    using var context = new PalletSyncDbContext();
-
-//    if (!context.Shelves.Where(a => a.Id == shelf.Id).Any())
-//    {
-//        context.Shelves.Add(shelf);
-//        context.SaveChanges();
-//    }
+//    context.Database.EnsureCreated();
 //}
 
-//AddShelf();
-PrintAllUsers();
-Console.WriteLine();
-PrintAllForklifts();
-
-
-
-
 //****API SETUP****
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
